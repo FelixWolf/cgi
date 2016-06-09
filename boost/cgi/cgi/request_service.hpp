@@ -80,7 +80,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       {
       }
 
-      std::size_t operator()(boost::system::error_code& ec)
+      std::size_t operator()(std::error_code& ec)
       {
         return service_->read_some(impl_, ec);
       }
@@ -119,7 +119,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       , int program_status = 0)
     {
       int s(0);
-      boost::system::error_code ec;
+      std::error_code ec;
       s = close(impl, http_s, program_status, ec);
       detail::throw_error(ec);
       return s;
@@ -128,7 +128,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Close the request.
     int close(implementation_type& impl,
         common::http::status_code http_s
-      , int program_status, boost::system::error_code& ec)
+      , int program_status, std::error_code& ec)
     {
       status(impl, common::closed);
       impl.http_status() = http_s;
@@ -137,9 +137,9 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     /// Synchronously read/parse the request data
-    boost::system::error_code&
+    std::error_code&
     load(implementation_type& impl, common::parse_options parse_opts
-        , boost::system::error_code& ec)
+        , std::error_code& ec)
     {
       if (parse_opts & common::parse_env)
       {
@@ -189,7 +189,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     std::size_t
-    read_some(implementation_type& impl, boost::system::error_code& ec)
+    read_some(implementation_type& impl, std::error_code& ec)
     {
       return impl.client_.read_some(impl.prepare(64), ec);
     }
@@ -197,8 +197,8 @@ BOOST_CGI_NAMESPACE_BEGIN
   protected:
     /// Read the environment variables into an internal map.
     template<typename RequestImpl>
-    boost::system::error_code
-    read_env_vars(RequestImpl& impl, boost::system::error_code& ec)
+    std::error_code
+    read_env_vars(RequestImpl& impl, std::error_code& ec)
     {
       // Only call this once.
       if (!(status(impl) & common::env_read))
@@ -211,8 +211,8 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     /// Read and parse the cgi POST meta variables (greedily)
     template<typename RequestImpl>
-    boost::system::error_code
-    parse_post_vars(RequestImpl& impl, boost::system::error_code& ec)
+    std::error_code
+    parse_post_vars(RequestImpl& impl, std::error_code& ec)
     {
       // **FIXME** use callback_functor<> in form_parser instead.
       std::size_t& bytes_left (impl.client_.bytes_left_);
@@ -226,7 +226,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       if (ec)
       {
         if (ec == boost::cgi::common::error::eof)
-          ec = boost::system::error_code();
+          ec = std::error_code();
         else
           return ec;
       }

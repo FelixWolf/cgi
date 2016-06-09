@@ -29,7 +29,7 @@ BOOST_CGI_NAMESPACE_BEGIN
   /// The service class for FCGI basic_request_acceptor<>s
   /**
    * Note: If the protocol is an asynchronous protocol, which means it 
-   * requires access to a boost::asio::io_service instance, then this class
+   * requires access to a asio::io_service instance, then this class
    * becomes a model of the Service concept (**LINK**) and must only use the
    * constructor which takes a ProtocolService (**LINK**). If the protocol
    * isn't async then the class can be used without a ProtocolService.
@@ -58,7 +58,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     typedef typename service_impl_type::accept_handler_type      accept_handler_type;
 
     /// The unique service identifier
-    //static boost::asio::io_service::id id;
+    //static asio::io_service::id id;
 
     fcgi_request_acceptor_service(common::io_service& ios)
       : detail::service_base<fcgi_request_acceptor_service<protocol_type> >(ios)
@@ -91,8 +91,8 @@ BOOST_CGI_NAMESPACE_BEGIN
       return service_impl_.service(impl);
     }
 
-    boost::system::error_code
-      default_init(implementation_type& impl, boost::system::error_code& ec)
+    std::error_code
+      default_init(implementation_type& impl, std::error_code& ec)
     {
       return service_impl_.default_init(impl, ec);
     }
@@ -104,41 +104,41 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     void close(implementation_type& impl)
     {
-      boost::system::error_code ec;
+      std::error_code ec;
       service_impl_.close(impl, ec);
       detail::throw_error(ec);
     }
 
-    boost::system::error_code
-      close(implementation_type& impl, boost::system::error_code& ec)
+    std::error_code
+      close(implementation_type& impl, std::error_code& ec)
     {
       return service_impl_.close(impl, ec);
     }
 
     template<typename InternetProtocol>
-    boost::system::error_code
+    std::error_code
       open(implementation_type& impl, const InternetProtocol& protocol
-          , boost::system::error_code& ec)
+          , std::error_code& ec)
     {
       return service_impl_.open(impl, protocol, ec);
     }
 
     template<typename Endpoint>
-    boost::system::error_code
+    std::error_code
       bind(implementation_type& impl, const Endpoint& endpoint
-          , boost::system::error_code& ec)
+          , std::error_code& ec)
     {
       return service_impl_.bind(impl, endpoint, ec);
     }
 
-    boost::system::error_code
-      listen(implementation_type& impl, int backlog, boost::system::error_code& ec)
+    std::error_code
+      listen(implementation_type& impl, int backlog, std::error_code& ec)
     {
       return service_impl_.listen(impl, backlog, ec);
     }
 
     int accept(implementation_type& impl, accept_handler_type handler
-            , endpoint_type * ep, boost::system::error_code& ec)
+            , endpoint_type * ep, std::error_code& ec)
     {
       return service_impl_.accept(impl, handler, ep, ec);
     }
@@ -150,9 +150,9 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     template<typename CommonGatewayRequest>
-    boost::system::error_code
+    std::error_code
       accept(implementation_type& impl, CommonGatewayRequest& request
-            , endpoint_type * ep, boost::system::error_code& ec)
+            , endpoint_type * ep, std::error_code& ec)
     {
       return service_impl_.accept(impl, request, ep, ec);
     }
@@ -171,15 +171,15 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     endpoint_type
-      local_endpoint(implementation_type& impl, boost::system::error_code& ec)
+      local_endpoint(implementation_type& impl, std::error_code& ec)
     {
       return service_impl_.local_endpoint(impl, ec);
     }
 
     template<typename InternetProtocol>
-    boost::system::error_code
+    std::error_code
       assign(implementation_type& impl, InternetProtocol protocol
-            , const native_handle_type& native_acceptor, boost::system::error_code& ec)
+            , const native_handle_type& native_acceptor, std::error_code& ec)
     {
       return service_impl_.assign(impl, protocol, native_acceptor, ec);
     }

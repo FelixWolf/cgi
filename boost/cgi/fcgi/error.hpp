@@ -25,7 +25,7 @@ enum fcgi_errors
 {
   bad_header_type = 1,
 
-  /// A packet arrived for a request id that doesn't exist and the 
+  /// A packet arrived for a request id that doesn't exist and the
   /// packet wasn't a BEGIN_REQUEST record.
   bad_request_id,
 
@@ -77,17 +77,17 @@ enum fcgi_errors
 
   // A client wasn't able to open.
   client_not_open,
-  
+
   // Multiplexing connections are not yet supported.
   // (I have no access to a server that supports it)
   multiplexing_not_supported,
-  
+
   // The client has already been closed.
   already_closed,
-  
+
   // An empty FastCGI packet was read (eg. STDIN or GET_PARAM data has been read).
   //empty_packet_read,
-  
+
   // End of File (read zero bytes)
   eof
 };
@@ -95,7 +95,7 @@ enum fcgi_errors
   namespace detail {
 
 class fcgi_category
-  : public boost::system::error_category
+  : public std::error_category
 {
 public:
   const char* name() const BOOST_NOEXCEPT { return "fcgi_error"; }
@@ -130,13 +130,13 @@ public:
 
   } // namespace detail
 
-inline const boost::system::error_category& get_fcgi_category()
+inline const std::error_category& get_fcgi_category()
 {
   static detail::fcgi_category instance;
   return instance;
 }
 
-static const boost::system::error_category& fcgi_category
+static const std::error_category& fcgi_category
   = ::BOOST_CGI_NAMESPACE::fcgi::error::get_fcgi_category();
 
   } // namespace error
@@ -159,10 +159,10 @@ namespace boost {
 BOOST_CGI_NAMESPACE_BEGIN
  namespace fcgi {
   namespace error {
-  
-    inline boost::system::error_code make_error_code(fcgi_errors e)
+
+    inline std::error_code make_error_code(fcgi_errors e)
     {
-      return boost::system::error_code(
+      return std::error_code(
           static_cast<int>(e), get_fcgi_category());
     }
 

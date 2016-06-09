@@ -18,11 +18,11 @@
 BOOST_CGI_NAMESPACE_BEGIN
  namespace detail {
 
-   inline void throw_error(const boost::system::error_code& ec)
+   inline void throw_error(const std::error_code& ec)
    {
      if(ec)
      {
-       boost::system::system_error err(ec);
+       std::system_error err(ec);
        //boost::throw_exception(err);
        throw err;
      }

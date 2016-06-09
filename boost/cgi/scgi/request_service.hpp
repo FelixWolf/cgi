@@ -86,7 +86,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         BOOST_ASSERT(size && "Attempting to allocate a zero-sized buffer.");
         std::size_t bufsz(param_buffer_.size());
         param_buffer_.resize(bufsz + size);
-        return boost::asio::buffer(&param_buffer_[bufsz], size);
+        return asio::buffer(&param_buffer_[bufsz], size);
       }
      };
 
@@ -99,7 +99,7 @@ BOOST_CGI_NAMESPACE_BEGIN
        {
        }
 
-       std::size_t operator()(boost::system::error_code& ec)
+       std::size_t operator()(std::error_code& ec)
        {
          return service_->read_some(impl_, ec);
        }
@@ -141,26 +141,26 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Close the request.
     int close(implementation_type& impl,
         common::http::status_code hsc
-      , int program_status, boost::system::error_code& ec);
+      , int program_status, std::error_code& ec);
 
     /// Clear all request data (object is then safe to reuse).
     void clear(implementation_type& impl);
 
     /// Load the request to a point where it can be usefully used.
-    boost::system::error_code
+    std::error_code
     load(implementation_type& impl, common::parse_options opts
-          , boost::system::error_code& ec);
+          , std::error_code& ec);
 
     /// Read and parse the cgi POST meta variables (greedily)
     template<typename RequestImpl>
-    boost::system::error_code
-    parse_post_vars(RequestImpl& impl, boost::system::error_code& ec)
+    std::error_code
+    parse_post_vars(RequestImpl& impl, std::error_code& ec)
     {
       // Return an error, except ignore EOF, as this is expected.
       if (ec)
       {
         if (ec == boost::cgi::common::error::eof)
-          ec = boost::system::error_code();
+          ec = std::error_code();
         else
           return ec;
       }
@@ -195,11 +195,11 @@ BOOST_CGI_NAMESPACE_BEGIN
     template<typename Handler>
     void do_load(
         implementation_type& impl, common::parse_options opts,
-        Handler handler, boost::system::error_code& ec
+        Handler handler, std::error_code& ec
       );
 
   private:
-    boost::asio::io_service::strand strand_;
+    asio::io_service::strand strand_;
   };
 
  } // namespace scgi

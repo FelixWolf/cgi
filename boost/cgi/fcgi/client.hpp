@@ -13,7 +13,7 @@
 ///////////////////////////////////////////////////////////
 #include <boost/shared_ptr.hpp>
 #include <boost/logic/tribool.hpp>
-#include <boost/asio/buffer.hpp>
+#include <asio/buffer.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/basic_client.hpp"
 #include "boost/cgi/common/map.hpp"
@@ -65,10 +65,10 @@ BOOST_CGI_NAMESPACE_BEGIN
    * connections after N requests).
    */
   template<>
-  boost::system::error_code
+  std::error_code
   basic_client<
       ::BOOST_CGI_NAMESPACE::common::tags::fcgi
-  >::close(boost::uint64_t app_status, boost::system::error_code& ec)
+  >::close(boost::uint64_t app_status, std::error_code& ec)
   {
     // Note that the request may already be closed if the client aborts
     // the connection.
@@ -87,7 +87,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         fcgi::spec::end_request_body body(app_status, fcgi::spec_detail::REQUEST_COMPLETE);
         outbuf_.push_back(header_.data());
         outbuf_.push_back(body.data());
-        write(*connection_, outbuf_, boost::asio::transfer_all(), ec);
+        write(*connection_, outbuf_, asio::transfer_all(), ec);
       }
       status_ = closed_;
 
@@ -122,13 +122,13 @@ BOOST_CGI_NAMESPACE_BEGIN
     typename ConstBufferSequence::const_iterator end  = buf.end(); 
 
     outbuf_.clear();
-    outbuf_.push_back(boost::asio::buffer(header_.data()));
+    outbuf_.push_back(asio::buffer(header_.data()));
 
     std::size_t total_buffer_size(0);
     for(; iter != end; ++iter)
     {
-      boost::asio::const_buffer buffer(*iter);
-      std::size_t new_buf_size( boost::asio::buffer_size(*iter) );
+      asio::const_buffer buffer(*iter);
+      std::size_t new_buf_size( asio::buffer_size(*iter) );
       if (total_buffer_size + new_buf_size 
            > static_cast<std::size_t>(fcgi::spec::max_packet_size::value))
       {
@@ -144,7 +144,7 @@ BOOST_CGI_NAMESPACE_BEGIN
                    << " / " << new_buf_size << " bytes sent\n";
           */
           outbuf_.push_back(
-            boost::asio::buffer(*iter, total_buffer_size));
+            asio::buffer(*iter, total_buffer_size));
           break;
         }
         else
@@ -163,7 +163,7 @@ BOOST_CGI_NAMESPACE_BEGIN
   void
   basic_client<
       ::BOOST_CGI_NAMESPACE::common::tags::fcgi
-  >::handle_write(std::size_t bytes_transferred, boost::system::error_code& ec)
+  >::handle_write(std::size_t bytes_transferred, std::error_code& ec)
   {
     total_sent_bytes_ += bytes_transferred;
     total_sent_packets_ += 1;
@@ -206,14 +206,14 @@ BOOST_CGI_NAMESPACE_BEGIN
       ::BOOST_CGI_NAMESPACE::common::tags::fcgi
   >::write_some(
       const ConstBufferSequence& buf
-    , boost::system::error_code& ec
+    , std::error_code& ec
   )
   {
     prepare_buffer(buf);
     
     std::size_t bytes_transferred
-      = boost::asio::write(*connection_, outbuf_
-                          , boost::asio::transfer_all(), ec);
+      = asio::write(*connection_, outbuf_
+                   , asio::transfer_all(), ec);
 
     handle_write(bytes_transferred, ec);
     
@@ -238,10 +238,10 @@ BOOST_CGI_NAMESPACE_BEGIN
   )
   {
     prepare_buffer(buf);
-    boost::system::error_code ec;
+    std::error_code ec;
     std::size_t bytes_transferred
-      = boost::asio::write(*connection_, outbuf_
-                          , boost::asio::transfer_all(), ec);
+      = asio::write(*connection_, outbuf_
+                   , asio::transfer_all(), ec);
     handle_write(bytes_transferred, ec);
     handler(bytes_transferred, ec);
   }

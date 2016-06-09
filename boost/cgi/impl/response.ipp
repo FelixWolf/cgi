@@ -174,7 +174,7 @@ BOOST_CGI_NAMESPACE_BEGIN
   template<typename SyncWriteStream> BOOST_CGI_INLINE
   void basic_response<T>::flush(SyncWriteStream& sws)
   {
-    boost::system::error_code ec;
+    std::error_code ec;
     flush(sws, ec);
     detail::throw_error(ec);
   }
@@ -186,20 +186,20 @@ BOOST_CGI_NAMESPACE_BEGIN
    */
   template<typename T>
   template<typename SyncWriteStream> BOOST_CGI_INLINE
-  boost::system::error_code
-  basic_response<T>::flush(SyncWriteStream& sws, boost::system::error_code& ec)
+  std::error_code
+  basic_response<T>::flush(SyncWriteStream& sws, std::error_code& ec)
   {
     if (!headers_terminated_)
     {
-      std::vector<boost::asio::const_buffer> headers;
+      std::vector<asio::const_buffer> headers;
       prepare_headers(headers);//, ec);
-      common::write(sws, headers, boost::asio::transfer_all(), ec);
+      common::write(sws, headers, asio::transfer_all(), ec);
       if (ec)
         return ec;
     }
 
     std::size_t bytes_written
-        = common::write(sws, buffer_->data(), boost::asio::transfer_all(), ec);
+        = common::write(sws, buffer_->data(), asio::transfer_all(), ec);
     if (!ec)
       buffer_->consume(bytes_written);
 
@@ -216,7 +216,7 @@ BOOST_CGI_NAMESPACE_BEGIN
   template<typename SyncWriteStream> BOOST_CGI_INLINE
   void basic_response<T>::send(SyncWriteStream& sws)
   {
-    boost::system::error_code ec;
+    std::error_code ec;
     send(sws, ec);
     detail::throw_error(ec);
   }
@@ -229,9 +229,9 @@ BOOST_CGI_NAMESPACE_BEGIN
    */
   template<typename T>
   template<typename SyncWriteStream> BOOST_CGI_INLINE
-  boost::system::error_code
+  std::error_code
     basic_response<T>::send(SyncWriteStream& sws
-                           , boost::system::error_code& ec)
+                           , std::error_code& ec)
   {
     if (!headers_terminated_)
     {
@@ -242,14 +242,14 @@ BOOST_CGI_NAMESPACE_BEGIN
       // want to send the whole response again.
       headers_terminated_ = true;
        */
-      std::vector<boost::asio::const_buffer> headers;
+      std::vector<asio::const_buffer> headers;
       prepare_headers(headers);//, ec)
-      common::write(sws, headers, boost::asio::transfer_all(), ec);
+      common::write(sws, headers, asio::transfer_all(), ec);
     }
 
     // Only write the body if it is non-empty.
     if (content_length())
-      common::write(sws, buffer_->data(), boost::asio::transfer_all(), ec);
+      common::write(sws, buffer_->data(), asio::transfer_all(), ec);
 
     return ec;
   }
@@ -259,7 +259,7 @@ BOOST_CGI_NAMESPACE_BEGIN
   template<typename SyncWriteStream> BOOST_CGI_INLINE
   void basic_response<T>::resend(SyncWriteStream& sws)
   {
-    std::vector<boost::asio::const_buffer> headers;
+    std::vector<asio::const_buffer> headers;
     prepare_headers(headers);//, ec)
     common::write(sws, headers);
 
@@ -354,8 +354,8 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
     
     body += string_type(
-      boost::asio::buffer_cast<const char_type *>(buffer_->data()),
-      boost::asio::buffer_size(buffer_->data()));
+      asio::buffer_cast<const char_type *>(buffer_->data()),
+      asio::buffer_size(buffer_->data()));
       
     return body;
   }

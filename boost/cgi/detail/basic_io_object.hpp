@@ -9,7 +9,7 @@
 #ifndef CGI_DETAIL_BASIC_IO_OBJECT_HPP_INCLUDED__
 #define CGI_DETAIL_BASIC_IO_OBJECT_HPP_INCLUDED__
 
-#include <boost/asio/basic_io_object.hpp>
+#include <asio/basic_io_object.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/type_traits/is_same.hpp>
 #include "boost/cgi/common/is_async.hpp"
@@ -36,7 +36,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      * @return A reference to the io_service object that the I/O object will 
      * use to dispatch handlers. Ownership is not transferred to the caller.
      */
-    boost::asio::io_service& get_io_service()
+    asio::io_service& get_io_service()
     {
       return service.get_io_service();
     }
@@ -85,7 +85,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      * @return A reference to the io_service object that the I/O object will 
      * use to dispatch handlers. Ownership is not transferred to the caller.
      */
-    boost::asio::io_service& get_io_service()
+    asio::io_service& get_io_service()
     {
       return service.get_io_service();
     }
@@ -96,8 +96,8 @@ BOOST_CGI_NAMESPACE_BEGIN
      * Performs:
      * @code service.construct(implementation); @endcode
      */
-    explicit basic_io_object(boost::asio::io_service& io_service)
-      : service(boost::asio::use_service<service_type>(io_service))
+    explicit basic_io_object(asio::io_service& io_service)
+      : service(asio::use_service<service_type>(io_service))
     {
       service.construct(implementation);
     }
@@ -135,7 +135,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      * @return A reference to the io_service object that the I/O object will 
      * use to dispatch handlers. Ownership is not transferred to the caller.
      */
-    boost::asio::io_service& get_io_service()
+    asio::io_service& get_io_service()
     {
       return service.get_io_service();
     }
@@ -148,7 +148,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      */
     explicit basic_io_object()
       : ios()
-      , service(boost::asio::use_service<service_type>(ios))
+      , service(asio::use_service<service_type>(ios))
     {
       service.construct(implementation);
     }
@@ -158,7 +158,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       service.destroy(implementation);
     }
 
-    boost::asio::io_service ios;
+    asio::io_service ios;
     service_type& service;
     implementation_type implementation;
   };

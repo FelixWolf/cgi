@@ -13,7 +13,7 @@
 #include <queue>
 ///////////////////////////////////////////////////////////
 #include <boost/shared_ptr.hpp>
-#include <boost/asio/strand.hpp>
+#include <asio/strand.hpp>
 #include <boost/detail/workaround.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/config.hpp"
@@ -51,7 +51,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
     }
 
-    basic_protocol_service(boost::asio::io_service& ios)
+    basic_protocol_service(asio::io_service& ios)
       : ios_provider_(ios)
       , request_set_()
       , request_queue_()

@@ -15,7 +15,7 @@
 
 #include <string>
 ////////////////////////////////////////////////////////////////
-#include <boost/asio/buffer.hpp>
+#include <asio/buffer.hpp>
 #include <boost/system/error_code.hpp>
 #include <boost/algorithm/string/find.hpp>
 #include <boost/fusion/include/vector.hpp>
@@ -49,7 +49,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       {
       }
 
-      std::size_t operator()(boost::system::error_code& ec)
+      std::size_t operator()(std::error_code& ec)
       {
         return service_->read_some(impl_, ec);
       }
@@ -149,7 +149,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         BOOST_ASSERT(size && "Attempting to allocate a zero-sized buffer.");
         std::size_t bufsz(post_buffer_.size());
         post_buffer_.resize(bufsz + size);
-        return boost::asio::buffer(&post_buffer_[bufsz], size);
+        return asio::buffer(&post_buffer_[bufsz], size);
       }
 
       protocol_service_type* service_;
@@ -209,7 +209,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Read some data into the internal buffer.
     template<typename ImplType>
     std::size_t
-    read_some(ImplType& impl, boost::system::error_code& ec)
+    read_some(ImplType& impl, std::error_code& ec)
     {
       return impl.client_.read_some(impl.prepare(64), ec);
     }
@@ -218,7 +218,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     template<typename ImplType, typename MutableBufferSequence>
     std::size_t
     read_some(ImplType& impl, const MutableBufferSequence& buf
-             , boost::system::error_code& ec)
+             , std::error_code& ec)
     {
       return impl.client_.read_some(buf,ec);
     }
@@ -280,9 +280,9 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     /// Synchronously read/parse the request meta-data
     template<typename ImplType>
-    boost::system::error_code
+    std::error_code
     load(ImplType& impl, common::parse_options parse_opts
-        , boost::system::error_code& ec)
+        , std::error_code& ec)
     {
       if (parse_opts & common::parse_env)
       {
@@ -326,8 +326,8 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     /// Read and parse the cgi GET meta variables
     template<typename ImplType>
-    boost::system::error_code
-    parse_get_vars(ImplType& impl, boost::system::error_code& ec)
+    std::error_code
+    parse_get_vars(ImplType& impl, std::error_code& ec)
     {
       if (!(status(impl) & common::get_read))
       {
@@ -351,8 +351,8 @@ BOOST_CGI_NAMESPACE_BEGIN
      *        for HTTP.
      */
     template<typename ImplType>
-    boost::system::error_code
-    parse_cookie_vars(ImplType& impl, const char* cookie_key, boost::system::error_code& ec)
+    std::error_code
+    parse_cookie_vars(ImplType& impl, const char* cookie_key, std::error_code& ec)
     {
       if (!(status(impl) & common::cookies_read))
       {
@@ -369,8 +369,8 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     /// Read and parse the cgi POST meta variables.
     template<typename ImplType, typename Callback>
-    boost::system::error_code&
-      parse_post_vars(ImplType& impl, Callback callback, boost::system::error_code& ec)
+    std::error_code&
+      parse_post_vars(ImplType& impl, Callback callback, std::error_code& ec)
     {
       if (!(status(impl) & common::post_read))
       {

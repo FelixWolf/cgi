@@ -61,7 +61,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      }
      
 //     const_buffer_type data() {
-//        return boost::asio::buffer(
+//        return asio::buffer(
 //     }
 
      string_type content;

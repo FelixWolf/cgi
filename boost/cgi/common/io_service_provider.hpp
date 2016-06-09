@@ -138,12 +138,12 @@ BOOST_CGI_NAMESPACE_BEGIN
     : private boost::noncopyable
   {
   public:
-    io_service_provider(boost::asio::io_service& ios)
+    io_service_provider(asio::io_service& ios)
       : io_service_(ios)
     {
     }
 
-    boost::asio:io_service& io_service()
+    asio:io_service& io_service()
     {
       return io_service_;
     }
@@ -163,7 +163,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       io_service_.reset();
     }
   private:
-    boost::asio::io_service& io_service_;
+    asio::io_service& io_service_;
   };
 ********************************/
 
@@ -186,13 +186,13 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
     }
 
-    boost::asio::io_service& io_service()
+    asio::io_service& io_service()
     {
       return io_service_;
     }
   private:
-    boost::asio::io_service io_service_;
-    boost::asio::io_service::work work_;
+    asio::io_service io_service_;
+    asio::io_service::work work_;
   };
 
 
@@ -202,8 +202,8 @@ BOOST_CGI_NAMESPACE_BEGIN
   class io_service_provider<-1, Policy>//tags::round_robin_pool>
     : private boost::noncopyable
   {
-    typedef boost::shared_ptr<boost::asio::io_service> io_service_ptr;
-    typedef boost::shared_ptr<boost::asio::io_service::work> work_ptr;
+    typedef boost::shared_ptr<asio::io_service> io_service_ptr;
+    typedef boost::shared_ptr<asio::io_service::work> work_ptr;
 
   public:
     io_service_provider(int pool_size = 7)
@@ -218,8 +218,8 @@ BOOST_CGI_NAMESPACE_BEGIN
       // not exit until they are explicitly stopped.
       for (std::size_t i = 0; i < pool_size; ++i)
       {
-        io_service_ptr io_service(new boost::asio::io_service);
-        work_ptr work(new boost::asio::io_service::work(*io_service));
+        io_service_ptr io_service(new asio::io_service);
+        work_ptr work(new asio::io_service::work(*io_service));
         io_services_.push_back(io_service);
         work_.push_back(work);
       }
@@ -232,7 +232,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       for (std::size_t i = 0; i < io_services_.size(); ++i)
       {
         boost::shared_ptr<boost::thread>
-          thread(new boost::thread(boost::bind(&boost::asio::io_service::run
+          thread(new boost::thread(boost::bind(&asio::io_service::run
                                               , io_services_[i])));
         threads.push_back(thread);
       }
@@ -250,9 +250,9 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     // NOT THREAD-SAFE (but should be)
-    boost::asio::io_service& io_service()
+    asio::io_service& io_service()
     {
-      boost::asio::io_service& io_service = *io_services_[pos_];
+      asio::io_service& io_service = *io_services_[pos_];
       if (++pos_ == io_services_.size())
         pos_ = 0;
       return io_service;
@@ -262,7 +262,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     std::vector<io_service_ptr> io_services_;
     std::vector<work_ptr> work_;
 
-    //boost::asio::io_service::strand strand_;
+    //asio::io_service::strand strand_;
   };
       */
  } // namespace common

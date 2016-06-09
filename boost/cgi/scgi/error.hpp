@@ -100,7 +100,7 @@ enum scgi_errors
   namespace detail {
 
 class scgi_category
-  : public boost::system::error_category
+  : public std::error_category
 {
 public:
   const char* name() const BOOST_NOEXCEPT { return "scgi_error"; }
@@ -137,13 +137,13 @@ public:
 
   } // namespace detail
 
-inline const boost::system::error_category& get_scgi_category()
+inline const std::error_category& get_scgi_category()
 {
   static detail::scgi_category instance;
   return instance;
 }
 
-static const boost::system::error_category& scgi_category
+static const std::error_category& scgi_category
   = ::BOOST_CGI_NAMESPACE::scgi::error::get_scgi_category();
 
   } // namespace error
@@ -167,9 +167,9 @@ BOOST_CGI_NAMESPACE_BEGIN
  namespace scgi {
   namespace error {
   
-    inline boost::system::error_code make_error_code(scgi_errors e)
+    inline std::error_code make_error_code(scgi_errors e)
     {
-      return boost::system::error_code(
+      return std::error_code(
           static_cast<int>(e), get_scgi_category());
     }
 

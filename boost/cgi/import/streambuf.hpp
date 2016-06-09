@@ -9,12 +9,12 @@
 #ifndef CGI_STREAMBUF_HPP_INCLUDED__
 #define CGI_STREAMBUF_HPP_INCLUDED__
 
-#include <boost/asio/streambuf.hpp>
+#include <asio/streambuf.hpp>
 
 BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
-  using boost::asio::streambuf;
+  using asio::streambuf;
 
  } // namespace common
 BOOST_CGI_NAMESPACE_END

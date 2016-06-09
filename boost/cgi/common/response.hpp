@@ -98,8 +98,8 @@ BOOST_CGI_NAMESPACE_BEGIN
      * If there is no error, the buffer is cleared.
      */
     template<typename SyncWriteStream>
-    boost::system::error_code
-      flush(SyncWriteStream& sws, boost::system::error_code& ec);
+    std::error_code
+      flush(SyncWriteStream& sws, std::error_code& ec);
 
     /// Synchronously send the data via the supplied request.
     /**
@@ -117,8 +117,8 @@ BOOST_CGI_NAMESPACE_BEGIN
      * object.
      */
     template<typename SyncWriteStream>
-    boost::system::error_code
-      send(SyncWriteStream& sws, boost::system::error_code& ec);
+    std::error_code
+      send(SyncWriteStream& sws, std::error_code& ec);
 
     /// Resend headers + content regardless of value of `headers_terminated_`.
     template<typename SyncWriteStream>

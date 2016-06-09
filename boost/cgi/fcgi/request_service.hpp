@@ -83,7 +83,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         BOOST_ASSERT(size && "Attempting to allocate a zero-sized buffer.");
         std::size_t bufsz(param_buffer_.size());
         param_buffer_.resize(bufsz + size);
-        return boost::asio::buffer(&param_buffer_[bufsz], size);
+        return asio::buffer(&param_buffer_[bufsz], size);
       }
      };
 
@@ -118,7 +118,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Close the request.
     int close(implementation_type& impl,
         http::status_code hsc
-      , int program_status, boost::system::error_code& ec);
+      , int program_status, std::error_code& ec);
 
     /// Clear all request data (object is then safe to reuse).
     void clear(implementation_type& impl);
@@ -134,9 +134,9 @@ BOOST_CGI_NAMESPACE_BEGIN
      *
      */
 
-    boost::system::error_code
+    std::error_code
     load(implementation_type& impl, common::parse_options opts
-          , boost::system::error_code& ec);
+          , std::error_code& ec);
 
     // **FIXME**
     template<typename Handler>
@@ -161,12 +161,12 @@ BOOST_CGI_NAMESPACE_BEGIN
     template<typename Handler>
     void do_load(
         implementation_type& impl, common::parse_options opts,
-        Handler handler, boost::system::error_code& ec
+        Handler handler, std::error_code& ec
       );
 
 
     void handle_read_header(
-        boost::system::error_code&
+        std::error_code&
       );
 
     template<typename Handler>
@@ -174,7 +174,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         implementation_type& impl, 
         ::BOOST_CGI_NAMESPACE::common::parse_options opts,
         Handler handler,
-        boost::system::error_code& ec,
+        std::error_code& ec,
         const std::size_t bytes_transferred
       );
 
@@ -183,7 +183,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         implementation_type& impl,
         common::parse_options opts,
         Handler handler,
-        boost::system::error_code& ec
+        std::error_code& ec
       );
 
     /// Asynchronously read a single header, but do nothing with it.
@@ -202,88 +202,88 @@ BOOST_CGI_NAMESPACE_BEGIN
         implementation_type& impl,
         common::parse_options opts,
         Handler handler,
-        boost::system::error_code& ec);
+        std::error_code& ec);
 
   protected:
     /// Read and parse the cgi POST meta variables (greedily)
-    boost::system::error_code&
-    parse_post_vars(implementation_type& impl, boost::system::error_code& ec);
+    std::error_code&
+    parse_post_vars(implementation_type& impl, std::error_code& ec);
 
     /// Read and parse a single cgi POST meta variable (greedily)
     template<typename RequestImpl>
-    boost::system::error_code&
-    parse_one_post_var(implementation_type& impl, boost::system::error_code& ec);
+    std::error_code&
+    parse_one_post_var(implementation_type& impl, std::error_code& ec);
 
   /***************************************************************************/
   public: // Reading stuff goes under here
 
     /// Read a single header, buf do nothing with it.
-    boost::system::error_code
-      read_header(implementation_type& impl, boost::system::error_code& ec);
+    std::error_code
+      read_header(implementation_type& impl, std::error_code& ec);
 
     /*** Various handlers go below here; they might find a
      * better place to live ***/
 
-    boost::system::error_code
-      handle_admin_request(implementation_type& impl, boost::system::error_code& ec);
+    std::error_code
+      handle_admin_request(implementation_type& impl, std::error_code& ec);
 
     // **FIXME**
     void handle_other_request_header(implementation_type& impl);
 
     // **FIXME**    
-    boost::system::error_code
+    std::error_code
       process_begin_request(implementation_type& impl, boost::uint16_t id
                            , const unsigned char* buf, std::size_t len
-                           , boost::system::error_code& ec);
+                           , std::error_code& ec);
 
-    boost::system::error_code
+    std::error_code
       process_abort_request(implementation_type& impl, boost::uint16_t id
                            , const unsigned char* buf, std::size_t len
-                           , boost::system::error_code& ec);
+                           , std::error_code& ec);
 
-    boost::system::error_code
+    std::error_code
       process_params(implementation_type& impl, boost::uint16_t id
                     , const unsigned char* buf, std::size_t len
-                    , boost::system::error_code& ec);
+                    , std::error_code& ec);
 
-    boost::system::error_code
+    std::error_code
       process_stdin(implementation_type& impl, boost::uint16_t id
                    , const unsigned char* buf, std::size_t len
-                   , boost::system::error_code& ec);
+                   , std::error_code& ec);
 
-    boost::system::error_code
+    std::error_code
       process_get_values(implementation_type& impl, boost::uint16_t id
-                   , boost::system::error_code& ec);
+                   , std::error_code& ec);
 
 
     /// Parse the current header
     boost::tribool parse_header(implementation_type& impl);
 
     /// Read in the FastCGI (env) params
-    boost::system::error_code
-    read_env_vars(implementation_type& impl, boost::system::error_code& ec);
+    std::error_code
+    read_env_vars(implementation_type& impl, std::error_code& ec);
 
-    boost::system::error_code
-      parse_packet(implementation_type& impl, boost::system::error_code& ec);
+    std::error_code
+      parse_packet(implementation_type& impl, std::error_code& ec);
       
     /// Read the body of the current packet; do nothing with it.
     template<typename MutableBuffersType>
-    boost::system::error_code
+    std::error_code
       read_body(implementation_type& impl, const MutableBuffersType& buffer
-               , boost::system::error_code& ec);
+               , std::error_code& ec);
 
     template<typename MutableBuffersType>
-    boost::system::error_code
+    std::error_code
       parse_body(implementation_type& impl, const MutableBuffersType& buffer
-                , boost::system::error_code& ec);
+                , std::error_code& ec);
 
-    boost::system::error_code
+    std::error_code
       begin_request_helper(implementation_type& impl
                           , header_buffer_type& header
-                          , boost::system::error_code& ec);
+                          , std::error_code& ec);
                           
   private:
-    boost::asio::io_service::strand strand_;
+    asio::io_service::strand strand_;
   };
 
  } // namespace fcgi

@@ -54,21 +54,21 @@ enum cgi_errors
 
   // A client wasn't able to open.
   client_not_open,
-  
+
   // End of File (read zero bytes)
   eof,
-  
+
   // The first multipart form boundary was not found.
   multipart_form_boundary_not_found,
-  
+
   // The first multipart form boundary was not found.
   multipart_meta_data_not_terminated,
-  
+
   // Expected a boundary marker for a multipart form, but did not find it.
   no_boundary_marker,
-  
+
   already_closed,
-  
+
   // The content length of the file upload is larger than maximum allowed
   // by the BOOST_CGI_POST_MAX macro.
   max_post_exceeded
@@ -77,7 +77,7 @@ enum cgi_errors
   namespace detail {
 
 class cgi_category
-  : public boost::system::error_category
+  : public std::error_category
 {
 public:
   const char* name() const BOOST_NOEXCEPT { return "CGI Error"; }
@@ -115,13 +115,13 @@ public:
 
   } // namespace detail
 
-inline const boost::system::error_category& get_cgi_category()
+inline const std::error_category& get_cgi_category()
 {
   static detail::cgi_category instance;
   return instance;
 }
 
-static const boost::system::error_category& cgi_category
+static const std::error_category& cgi_category
   = ::BOOST_CGI_NAMESPACE::common::error::get_cgi_category();
 
   } // namespace error
@@ -144,10 +144,10 @@ namespace boost {
 BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
   namespace error {
-  
-    inline boost::system::error_code make_error_code(cgi_errors e)
+
+    inline std::error_code make_error_code(cgi_errors e)
     {
-      return boost::system::error_code(
+      return std::error_code(
           static_cast<int>(e), get_cgi_category());
     }
 

@@ -33,13 +33,13 @@ BOOST_CGI_NAMESPACE_BEGIN
     {
       if (transport_ == detail::transport::pipe)
 #if BOOST_WINDOWS
-        // pipe_.reset(new boost::asio::windows::stream_handle(ios));
+        // pipe_.reset(new asio::windows::stream_handle(ios));
         pipe_.reset(new basic_connection<tags::anonymous_pipe>(ios));
 #else
-        pipe_.reset(new boost::asio::local::stream_protocol::socket(ios));
+        pipe_.reset(new asio::local::stream_protocol::socket(ios));
 #endif // BOOST_WINDOWS
       else // transport_ == detail::transport::socket
-        socket_.reset(new boost::asio::ip::tcp::socket(ios));
+        socket_.reset(new asio::ip::tcp::socket(ios));
     }
 
     bool is_open() const
@@ -74,7 +74,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     template<typename MutableBufferSequence>
     std::size_t read_some(const MutableBufferSequence& buf
-                         , boost::system::error_code& ec)
+                         , std::error_code& ec)
     {
       if (transport_ == detail::transport::pipe)
         return pipe_->read_some(buf, ec);
@@ -102,7 +102,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     template<typename ConstBufferSequence>
     std::size_t write_some(ConstBufferSequence& buf
-                          , boost::system::error_code& ec)
+                          , std::error_code& ec)
     {
       if (transport_ == detail::transport::pipe)
         return pipe_->write_some(buf, ec);
@@ -121,7 +121,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
   public:
 #if BOOST_WINDOWS
-    // boost::scoped_ptr<boost::asio::windows::stream_handle> pipe_;
+    // boost::scoped_ptr<asio::windows::stream_handle> pipe_;
     // NOTE: windows::stream_handle has the precondition that the handle was opened with FILE_FLAG_OVERLAPPED.
     //       Apache's mod_fcgid (and others?) create the named pipe handle without this before passing it as
     //       stdin.  Due to the way that windows pipe client/server semantics work it is impossiblet to upgrade
@@ -130,9 +130,9 @@ BOOST_CGI_NAMESPACE_BEGIN
     boost::scoped_ptr<basic_connection<tags::anonymous_pipe>> pipe_;
     
 #else
-    boost::scoped_ptr<boost::asio::local::stream_protocol::socket> pipe_;
+    boost::scoped_ptr<asio::local::stream_protocol::socket> pipe_;
 #endif // BOOST_WINDOWS
-    boost::scoped_ptr<boost::asio::ip::tcp::socket> socket_;
+    boost::scoped_ptr<asio::ip::tcp::socket> socket_;
   private:
 
     detail::transport::type transport_;

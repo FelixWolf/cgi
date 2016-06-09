@@ -73,7 +73,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
       void operator()()
       {
-        boost::system::error_code ec;
+        std::error_code ec;
         std::size_t bytes_read = cptr_->read_some(buf_, ec);
         handler_(ec, bytes_read);
       }
@@ -106,7 +106,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
       void operator()()
       {
-        boost::system::error_code ec;
+        std::error_code ec;
         std::size_t bytes_written = cptr_->write_some(buf_, ec);
         handler_(ec, bytes_written);
       }

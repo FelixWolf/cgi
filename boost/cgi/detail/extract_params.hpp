@@ -26,15 +26,15 @@ BOOST_CGI_NAMESPACE_BEGIN
     *
     */
    template<typename String, typename Map, typename Separator>
-   boost::system::error_code&
+   std::error_code&
    extract_params(const String& input
                  , Map& destination
                  , const Separator& separator
-                 , boost::system::error_code& ec
+                 , std::error_code& ec
                  , bool url_decode_values = true)
    {
      if( input.empty() )
-       return ec;// = boost::system::error_code(34, boost::system::errno_ecat);
+       return ec;// = std::error_code(34, boost::system::errno_ecat);
 
      typedef typename boost::tokenizer<Separator>    tokenizer;
      typedef typename Map::value_type                value_type  __attribute__((__unused__));

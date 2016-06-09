@@ -81,15 +81,15 @@ BOOST_CGI_NAMESPACE_BEGIN
      * serves that request.
      */
     template<typename RequestImpl>
-    boost::system::error_code
-      construct(RequestImpl& req __attribute__((__unused__)), boost::system::error_code& ec)
+    std::error_code
+      construct(RequestImpl& req __attribute__((__unused__)), std::error_code& ec)
     {
       status_ = constructed;
       return ec;
     }
 
-    boost::system::error_code
-      close(boost::uint64_t app_status, boost::system::error_code& ec)
+    std::error_code
+      close(boost::uint64_t app_status, std::error_code& ec)
     {
       if (!is_open())
         ec = error::already_closed;
@@ -103,7 +103,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     void close(boost::uint64_t app_status = 0)
     {
-      boost::system::error_code ec;
+      std::error_code ec;
       close(app_status, ec);
       detail::throw_error(ec);
     }
@@ -133,7 +133,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Write some data to the client.
     template<typename ConstBufferSequence>
     std::size_t write_some(const ConstBufferSequence& buf
-                          , boost::system::error_code& ec)
+                          , std::error_code& ec)
     {
       return connection_->write_some(buf, ec);
     }
@@ -154,12 +154,12 @@ BOOST_CGI_NAMESPACE_BEGIN
      */
     template<typename MutableBufferSequence>
     std::size_t read_some(const MutableBufferSequence& buf
-                         , boost::system::error_code& ec)
+                         , std::error_code& ec)
     {
       std::size_t bytes_read = connection_->read_some(buf, ec);
       bytes_left_ -= bytes_read;
-      if (ec == boost::asio::error::eof)
-        ec = boost::system::error_code();
+      if (ec == asio::error::eof)
+        ec = std::error_code();
       return bytes_left_ > 0 ? bytes_read : (bytes_read + bytes_left_);
     }
 
@@ -217,7 +217,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     { /* NOOP */ }
 
     void handle_write(
-      std::size_t bytes_transferred, boost::system::error_code& ec)
+      std::size_t bytes_transferred, std::error_code& ec)
     { /* NOOP */ }
 
     //io_service&                           io_service_;
@@ -241,7 +241,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      * This doesn't take ownership of the underlying memory, so the
      * data must remain valid until it has been completely written.
      */
-    std::vector<boost::asio::const_buffer> outbuf_;
+    std::vector<asio::const_buffer> outbuf_;
 
     bool keep_connection_;
     common::role_type role_;

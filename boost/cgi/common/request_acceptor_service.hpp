@@ -54,9 +54,9 @@ BOOST_CGI_NAMESPACE_BEGIN
      * connection, and associate it with the request.
      */
     template<typename CommonGatewayRequest>
-    boost::system::error_code&
+    std::error_code&
     accept(implementation_type& impl, CommonGatewayRequest& request
-          , boost::system::error_code& ec)
+          , std::error_code& ec)
     {
       return service_impl_.accept(impl, request, ec);
       /*      

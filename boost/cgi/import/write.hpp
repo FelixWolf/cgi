@@ -9,13 +9,13 @@
 #ifndef CGI_WRITE_HPP_INCLUDED
 #define CGI_WRITE_HPP_INCLUDED
 
-#include <boost/asio/write.hpp>
+#include <asio/write.hpp>
 
 BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
-  using boost::asio::write;
-  using boost::asio::async_write;
+  using asio::write;
+  using asio::async_write;
 
  } // namespace common
 BOOST_CGI_NAMESPACE_END

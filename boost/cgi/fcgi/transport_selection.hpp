@@ -14,7 +14,7 @@
 
 #include <algorithm>
 #include <limits>
-#include <boost/asio.hpp>
+#include <asio.hpp>
 
 BOOST_CGI_NAMESPACE_BEGIN
 
@@ -45,7 +45,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       return transport::pipe;
     }
 
-    inline boost::asio::ip::tcp::socket::native_handle_type socket_handle(boost::system::error_code &ec = boost::system::error_code())
+    inline asio::ip::tcp::socket::native_handle_type socket_handle(std::error_code &ec = std::error_code())
     {
         HANDLE std_input = ::GetStdHandle(STD_INPUT_HANDLE);
         SOCKET socket = 0;
@@ -56,18 +56,18 @@ BOOST_CGI_NAMESPACE_BEGIN
         std::fill_n(static_cast<DWORD*>(static_cast<void*>(&pi)), sizeof(pi) / sizeof(DWORD), 0);
         static_assert(sizeof(HANDLE) == sizeof(SOCKET), "incompatible data type sizes for reinterpret_cast");
         if (::WSADuplicateSocket(reinterpret_cast<SOCKET>(std_input), ::GetCurrentProcessId(), &pi) != 0)
-            ec = boost::system::error_code(::WSAGetLastError(), boost::system::system_category());
+            ec = std::error_code(::WSAGetLastError(), std::system_category());
         else if ((socket = ::WSASocket(pi.iAddressFamily, pi.iSocketType, pi.iProtocol, &pi, 0, 0)) == (std::numeric_limits<SOCKET>::max)())
-            ec = boost::system::error_code(::WSAGetLastError(), boost::system::system_category());
+            ec = std::error_code(::WSAGetLastError(), std::system_category());
         else if (::SetStdHandle(STD_INPUT_HANDLE, reinterpret_cast<HANDLE>(socket)) == FALSE)
-            ec = boost::system::error_code(::GetLastError(), boost::system::system_category());
+            ec = std::error_code(::GetLastError(), std::system_category());
         else if (::closesocket(reinterpret_cast<SOCKET>(std_input)) == SOCKET_ERROR)
-            ec = boost::system::error_code(::WSAGetLastError(), boost::system::system_category());
+            ec = std::error_code(::WSAGetLastError(), std::system_category());
 
         return socket;
     }
 
-    inline HANDLE stream_handle(boost::system::error_code &ec = boost::system::error_code())
+    inline HANDLE stream_handle(std::error_code &ec = std::error_code())
     {
         HANDLE stdin_handle = ::GetStdHandle(STD_INPUT_HANDLE);
         HANDLE listen_handle = INVALID_HANDLE_VALUE;
@@ -80,11 +80,11 @@ BOOST_CGI_NAMESPACE_BEGIN
             , TRUE
             , DUPLICATE_SAME_ACCESS))
         {
-            ec = boost::system::error_code(::GetLastError(), boost::system::system_category());
+            ec = std::error_code(::GetLastError(), std::system_category());
         }
         else if (::SetStdHandle(STD_INPUT_HANDLE, listen_handle) == FALSE)
         {
-            ec = boost::system::error_code(::GetLastError(), boost::system::system_category());
+            ec = std::error_code(::GetLastError(), std::system_category());
         }
         else
         {
@@ -92,13 +92,13 @@ BOOST_CGI_NAMESPACE_BEGIN
 
             DWORD pipe_mode = PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT;
             if (::SetNamedPipeHandleState(listen_handle, &pipe_mode, NULL, NULL) == FALSE)
-                ec = boost::system::error_code(::GetLastError(), boost::system::system_category());
+                ec = std::error_code(::GetLastError(), std::system_category());
         }
 
         return listen_handle;
     }
 
-    inline boost::asio::ip::tcp::endpoint detect_endpoint(SOCKET socket = (std::numeric_limits<SOCKET>::max)()) {
+    inline asio::ip::tcp::endpoint detect_endpoint(SOCKET socket = (std::numeric_limits<SOCKET>::max)()) {
       if (socket == (std::numeric_limits<SOCKET>::max)())
         socket = reinterpret_cast<SOCKET>(::GetStdHandle(STD_INPUT_HANDLE));
 
@@ -123,32 +123,32 @@ BOOST_CGI_NAMESPACE_BEGIN
               case AF_INET:
               {
                 sockaddr_in* sa = reinterpret_cast<sockaddr_in*>(pSockAddr);
-                boost::asio::ip::address_v4 v4(ntohl(sa->sin_addr.S_un.S_addr));
-                boost::asio::ip::address addr(v4);
-                return boost::asio::ip::tcp::endpoint(addr, ntohs(sa->sin_port));
+                asio::ip::address_v4 v4(ntohl(sa->sin_addr.S_un.S_addr));
+                asio::ip::address addr(v4);
+                return asio::ip::tcp::endpoint(addr, ntohs(sa->sin_port));
               }
 
               case AF_INET6:
               {
                 sockaddr_in6* sa = reinterpret_cast<sockaddr_in6*>(pSockAddr);
-                boost::asio::ip::address_v6 v6(reinterpret_cast<boost::asio::ip::address_v6::bytes_type const&>(sa->sin6_addr.u.Byte), ntohl(sa->sin6_scope_id));
-                boost::asio::ip::address addr(v6);
-                return boost::asio::ip::tcp::endpoint(addr, ntohs(sa->sin6_port));
+                asio::ip::address_v6 v6(reinterpret_cast<asio::ip::address_v6::bytes_type const&>(sa->sin6_addr.u.Byte), ntohl(sa->sin6_scope_id));
+                asio::ip::address addr(v6);
+                return asio::ip::tcp::endpoint(addr, ntohs(sa->sin6_port));
               }
             }
           }
         }
       }
 
-      return boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), 0);
+      return asio::ip::tcp::endpoint(asio::ip::tcp::v4(), 0);
     }
 #else
        inline transport::type transport_type() {
            return transport::socket;
        }
 
-       inline boost::asio::ip::tcp::endpoint detect_endpoint() {
-         return boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), 0);
+       inline asio::ip::tcp::endpoint detect_endpoint() {
+         return asio::ip::tcp::endpoint(asio::ip::tcp::v4(), 0);
        }
 
 #endif // defined (BOOST_WINDOWS)

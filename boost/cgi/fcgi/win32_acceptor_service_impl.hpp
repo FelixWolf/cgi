@@ -13,7 +13,7 @@
 
 #include <boost/ref.hpp>
 #include <boost/bind.hpp>
-#include <boost/asio.hpp>
+#include <asio.hpp>
 #include <boost/thread.hpp>
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
@@ -59,7 +59,7 @@ BOOST_CGI_NAMESPACE_BEGIN
        Handler handler;
      };
 
-    // inline bool default_init_pipe(HANDLE &listen_handle, boost::system::error_code &ec)
+    // inline bool default_init_pipe(HANDLE &listen_handle, std::error_code &ec)
     // {
     //   bool is_cgi = false;
 
@@ -102,17 +102,17 @@ BOOST_CGI_NAMESPACE_BEGIN
     //}
      
     template<typename Connection>
-    boost::system::error_code
-    accept_named_pipe(HANDLE& listen_handle, Connection& connection, boost::system::error_code& ec)
+    std::error_code
+    accept_named_pipe(HANDLE& listen_handle, Connection& connection, std::error_code& ec)
     {
         OVERLAPPED overlapped;
         ::ZeroMemory(&overlapped, sizeof(overlapped)); 
         overlapped.hEvent = ::CreateEvent(NULL, FALSE, FALSE, NULL); 
         if (!overlapped.hEvent) 
 #if BOOST_VERSION < 104400
-            ec = boost::system::error_code(::GetLastError(), boost::system::system_category); 
+            ec = std::error_code(::GetLastError(), std::system_category); 
 #else
-            ec = boost::system::error_code(::GetLastError(), boost::system::system_category()); 
+            ec = std::error_code(::GetLastError(), std::system_category()); 
 #endif
         if (! ::ConnectNamedPipe(listen_handle, &overlapped)) 
         { 
@@ -123,9 +123,9 @@ BOOST_CGI_NAMESPACE_BEGIN
             { 
               ::CloseHandle(overlapped.hEvent); 
 #if BOOST_VERSION < 104400
-              ec = boost::system::error_code(::GetLastError(), boost::system::system_category); 
+              ec = std::error_code(::GetLastError(), std::system_category); 
 #else
-              ec = boost::system::error_code(::GetLastError(), boost::system::system_category()); 
+              ec = std::error_code(::GetLastError(), std::system_category()); 
 #endif
             } 
             break;
@@ -137,9 +137,9 @@ BOOST_CGI_NAMESPACE_BEGIN
           default:
             ::CloseHandle(overlapped.hEvent); 
 #if BOOST_VERSION < 104400
-            ec = boost::system::error_code(::GetLastError(), boost::system::system_category); 
+            ec = std::error_code(::GetLastError(), std::system_category); 
 #else
-            ec = boost::system::error_code(::GetLastError(), boost::system::system_category()); 
+            ec = std::error_code(::GetLastError(), std::system_category()); 
 #endif
           }
         }
@@ -164,7 +164,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     *       acceptor_service_impl<fcgi> acceptor_service_impl_; // etc...
     *
     * Note: If the protocol is an asynchronous protocol, which means it
-    * requires access to a boost::asio::io_service instance, then this
+    * requires access to a asio::io_service instance, then this
     * class becomes a model of the Service concept (**LINK**) and must
     * only use the constructor which takes a ProtocolService (**LINK**).
     * If the protocol isn't async then the class can be used without a
@@ -210,14 +210,14 @@ BOOST_CGI_NAMESPACE_BEGIN
        protocol_service_type*                        service_;
        endpoint_type                                 endpoint_;
        boost::uint16_t                               async_accepts_;
-       boost::system::error_code                     error_code_;
+       std::error_code                     error_code_;
 
        implementation_type() : async_accepts_(0) {}
      };
 
      explicit win32_acceptor_service_impl(::BOOST_CGI_NAMESPACE::common::io_service& ios)
        : detail::service_base< ::BOOST_CGI_NAMESPACE::fcgi::win32_acceptor_service_impl<Protocol> >(ios)
-       , acceptor_service_(boost::asio::use_service<acceptor_service_type>(ios))
+       , acceptor_service_(asio::use_service<acceptor_service_type>(ios))
        , strand_(ios)
        , transport_(detail::transport_type())
        , listen_handle_(INVALID_HANDLE_VALUE)
@@ -232,8 +232,8 @@ BOOST_CGI_NAMESPACE_BEGIN
      }
 
      /// Default-initialize the acceptor.
-     boost::system::error_code
-       default_init(implementation_type& impl, boost::system::error_code& ec)
+     std::error_code
+       default_init(implementation_type& impl, std::error_code& ec)
      {
          is_cgi_ = false;
          if (transport_ == detail::transport::pipe)
@@ -290,35 +290,35 @@ BOOST_CGI_NAMESPACE_BEGIN
      }
 
      /// Open a new *socket* acceptor implementation.
-     boost::system::error_code
+     std::error_code
        open(implementation_type& impl, const native_protocol_type& protocol
-           , boost::system::error_code& ec)
+           , std::error_code& ec)
      {
        return acceptor_service_.open(impl.acceptor_, protocol, ec);
      }
 
      template<typename Endpoint>
-     boost::system::error_code
+     std::error_code
        bind(implementation_type& impl, const Endpoint& endpoint
-           , boost::system::error_code& ec)
+           , std::error_code& ec)
      {
        acceptor_service_.set_option(impl.acceptor_,
-           boost::asio::socket_base::reuse_address(true), ec);
+           asio::socket_base::reuse_address(true), ec);
        return acceptor_service_.bind(impl.acceptor_, endpoint, ec);
      }
 
      /// Assign an existing native acceptor to a *socket* acceptor.
-     boost::system::error_code
+     std::error_code
        assign(implementation_type& impl, const native_protocol_type& protocol
              , const native_handle_type& native_acceptor
-             , boost::system::error_code& ec)
+             , std::error_code& ec)
      {
        return acceptor_service_.assign(impl.acceptor_, protocol
                                       , native_acceptor, ec);
      }
 
-     boost::system::error_code
-       listen(implementation_type& impl, int backlog, boost::system::error_code& ec)
+     std::error_code
+       listen(implementation_type& impl, int backlog, std::error_code& ec)
      {
        return acceptor_service_.listen(impl.acceptor_, backlog, ec);
      }
@@ -349,14 +349,14 @@ BOOST_CGI_NAMESPACE_BEGIN
          // ...otherwise accept a new connection.
          if (transport_ == detail::transport::pipe)
          {
-            boost::system::error_code ec;
+            std::error_code ec;
             detail::accept_named_pipe(listen_handle_, *new_request->client().connection(), ec);
             if (!ec)
               strand_.post(boost::bind(&self_type::handle_accept, this, boost::ref(impl), new_request, handler, ec));
          }
          else // transport_ == detail::transport::socket
          {
-           boost::system::error_code ec;
+           std::error_code ec;
            acceptor_service_.accept(impl.acceptor_, *new_request->client().connection()->socket_, &impl.endpoint_, ec);
            if (!ec)
               strand_.post(boost::bind(&self_type::handle_accept, this, boost::ref(impl), new_request, handler, ec));
@@ -366,7 +366,7 @@ BOOST_CGI_NAMESPACE_BEGIN
        {
          if (transport_ == detail::transport::pipe)
          {
-           strand_.post(boost::bind(&self_type::handle_accept, this, boost::ref(impl), new_request, handler, boost::system::error_code()));
+           strand_.post(boost::bind(&self_type::handle_accept, this, boost::ref(impl), new_request, handler, std::error_code()));
          }
          else // transport_ == detail::transport::socket
          {
@@ -376,14 +376,14 @@ BOOST_CGI_NAMESPACE_BEGIN
              , boost::ref(impl)
              , new_request
              , handler
-             , boost::system::error_code())));
+             , std::error_code())));
          }
        }
      }
 
      void handle_accept(
          implementation_type& impl, request_ptr new_request,
-         accept_handler_type handler, const boost::system::error_code& ec
+         accept_handler_type handler, const std::error_code& ec
       )
      {
        if (impl.error_code_)
@@ -406,7 +406,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
        if (status != 0)
        {
-         impl.error_code_ = boost::system::error_code(status, boost::system::generic_category());
+         impl.error_code_ = std::error_code(status, boost::system::generic_category());
          return;
        }
  
@@ -429,7 +429,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      }
      
      int accept(implementation_type& impl, accept_handler_type handler
-             , endpoint_type* endpoint, boost::system::error_code& ec)
+             , endpoint_type* endpoint, std::error_code& ec)
      {
        typedef typename std::set<request_ptr>::iterator iter_t;
        typedef std::pair<iter_t, bool> pair_t;
@@ -480,9 +480,9 @@ BOOST_CGI_NAMESPACE_BEGIN
 
      /// Accepts one request.
      template<typename CommonGatewayRequest>
-     boost::system::error_code
+     std::error_code
        accept(implementation_type& impl, CommonGatewayRequest& request
-             , endpoint_type* endpoint, boost::system::error_code& ec)
+             , endpoint_type* endpoint, std::error_code& ec)
      {
        BOOST_ASSERT
        ( ! request.is_open()
@@ -523,18 +523,18 @@ BOOST_CGI_NAMESPACE_BEGIN
      }
 
      /// Close the acceptor (not implemented yet).
-     boost::system::error_code
-       close(implementation_type& impl, boost::system::error_code& ec)
+     std::error_code
+       close(implementation_type& impl, std::error_code& ec)
      {
 #if BOOST_VERSION < 104400
-       return boost::system::error_code(348, boost::system::system_category);
+       return std::error_code(348, std::system_category);
 #else
-       return boost::system::error_code(348, boost::system::system_category());
+       return std::error_code(348, std::system_category());
 #endif
      }
 
      typename implementation_type::endpoint_type
-       local_endpoint(implementation_type& impl, boost::system::error_code& ec)
+       local_endpoint(implementation_type& impl, std::error_code& ec)
      {
        return acceptor_service_.local_endpoint(impl.acceptor_, ec);
      }
@@ -554,7 +554,7 @@ BOOST_CGI_NAMESPACE_BEGIN
        }
        else // transport_ == detail::transport::socket
        {
-         boost::system::error_code ec;
+         std::error_code ec;
          socklen_t len(static_cast<socklen_t>(local_endpoint(impl,ec).capacity()));
          int check (getpeername(native(impl), local_endpoint(impl,ec).data(), &len));
          return ( check == SOCKET_ERROR && WSAGetLastError() == WSAENOTCONN ) ? false : true;
@@ -580,12 +580,12 @@ BOOST_CGI_NAMESPACE_BEGIN
 
        // If we can reuse this request's connection, return.
        if (request.client().keep_connection())
-         return handler(boost::system::error_code());
+         return handler(std::error_code());
 
        // ...otherwise accept a new connection.
        if (transport_ == detail::transport::pipe)
        {
-         boost::system::error_code ec;
+         std::error_code ec;
          detail::accept_named_pipe(listen_handle_, *request.client().connection(), ec);
          strand_.post(handler);
        }
@@ -600,7 +600,7 @@ BOOST_CGI_NAMESPACE_BEGIN
    public:
      /// The underlying socket acceptor service.
      acceptor_service_type&          acceptor_service_;
-     boost::asio::io_service::strand strand_;
+     asio::io_service::strand strand_;
      detail::transport::type transport_;
      HANDLE listen_handle_;
      bool is_cgi_;

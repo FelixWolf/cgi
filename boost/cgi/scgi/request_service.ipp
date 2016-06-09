@@ -56,7 +56,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
        void operator()()
        {
-         boost::system::error_code ec;
+         std::error_code ec;
          type.load(impl_, parse_opts_, ec);
          handler_(ec);
        }
@@ -87,7 +87,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       , common::http::status_code hsc
       , int program_status)
     {
-      boost::system::error_code ec;
+      std::error_code ec;
       close(impl, hsc, program_status, ec);
       detail::throw_error(ec);
       return program_status;
@@ -99,7 +99,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         implementation_type& impl
       , common::http::status_code hsc
       , int program_status
-      , boost::system::error_code& ec)
+      , std::error_code& ec)
     {
       impl.all_done_ = true;
       impl.client_.close(program_status, ec);
@@ -124,10 +124,10 @@ BOOST_CGI_NAMESPACE_BEGIN
       
     /// Load the request to a point where it can be usefully used.
     template<typename Protocol>
-    BOOST_CGI_INLINE boost::system::error_code
+    BOOST_CGI_INLINE std::error_code
     scgi_request_service<Protocol>::load(
         implementation_type& impl, common::parse_options parse_opts
-      , boost::system::error_code& ec)
+      , std::error_code& ec)
     {
       impl.client_.construct(impl, ec);
 
@@ -144,7 +144,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         // the ec and length parameters reflect the result of the asynchronous
         // operation.
         std::size_t length
-          = impl.client_.connection()->read_some(boost::asio::buffer(*impl.buffer_));
+          = impl.client_.connection()->read_some(asio::buffer(*impl.buffer_));
 
         // Parse the data we just received.
         boost::tie(impl.valid_request_, boost::tuples::ignore)
@@ -205,7 +205,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     BOOST_CGI_INLINE
     void scgi_request_service<Protocol>::do_load(
         implementation_type& impl, common::parse_options opts,
-        Handler handler, boost::system::error_code& ec
+        Handler handler, std::error_code& ec
       )
     {
       impl.client_.construct(impl, ec);

@@ -10,11 +10,11 @@
 #define CGI_BASIC_REQUEST_ACCEPTOR_HPP_INCLUDED__
 
 #include <boost/noncopyable.hpp>
-#include <boost/asio/ip/tcp.hpp>
+#include <asio/ip/tcp.hpp>
 #include <boost/system/error_code.hpp>
-#include <boost/asio/basic_io_object.hpp>
-#include <boost/asio/ip/basic_endpoint.hpp>
-#include <boost/asio/ip/tcp.hpp>
+#include <asio/basic_io_object.hpp>
+#include <asio/ip/basic_endpoint.hpp>
+#include <asio/ip/tcp.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/detail/throw_error.hpp"
 #include "boost/cgi/common/basic_protocol_service.hpp"
@@ -25,8 +25,8 @@ BOOST_CGI_NAMESPACE_BEGIN
   /// The interface class for any *BOOST_CGI_NAMESPACE::acceptor.
   template<typename Protocol>
   class basic_request_acceptor
-    //: public boost::asio::basic_io_object<RequestAcceptorService>
-    : public boost::asio::basic_io_object<
+    //: public asio::basic_io_object<RequestAcceptorService>
+    : public asio::basic_io_object<
         typename protocol_traits<Protocol>::acceptor_service
       >
     //, private boost::noncopyable
@@ -46,11 +46,11 @@ BOOST_CGI_NAMESPACE_BEGIN
     template<typename IoServiceProvider>
     explicit basic_request_acceptor(
           common::basic_protocol_service<protocol_type, IoServiceProvider>& ps)
-      : boost::asio::basic_io_object<service_type>(ps.get_io_service())
+      : asio::basic_io_object<service_type>(ps.get_io_service())
     {
       this->service.set_protocol_service(this->implementation, ps);
 
-      boost::system::error_code ec;
+      std::error_code ec;
       if (this->service.default_init(this->implementation, ec)) {
         detail::throw_error(ec);
       }
@@ -59,9 +59,9 @@ BOOST_CGI_NAMESPACE_BEGIN
     template<typename IoServiceProvider, typename InternetProtocol>
     explicit basic_request_acceptor(
           common::basic_protocol_service<protocol_type, IoServiceProvider>& ps,
-          const boost::asio::ip::basic_endpoint<InternetProtocol>& endpoint,
+          const asio::ip::basic_endpoint<InternetProtocol>& endpoint,
           bool reuse_addr = true)
-      : boost::asio::basic_io_object<service_type>(ps.get_io_service())
+      : asio::basic_io_object<service_type>(ps.get_io_service())
     {
       this->service.set_protocol_service(this->implementation, ps);
       this->implementation.endpoint_ = endpoint;
@@ -72,10 +72,10 @@ BOOST_CGI_NAMESPACE_BEGIN
           common::basic_protocol_service<protocol_type, IoServiceProvider>& ps,
           const InternetProtocol& ip,
           const native_handle_type& native_acceptor)
-      : boost::asio::basic_io_object<service_type>(ps.get_io_service())
+      : asio::basic_io_object<service_type>(ps.get_io_service())
     {
       this->service.set_protocol_service(this->implementation, ps);
-      boost::system::error_code ec;
+      std::error_code ec;
       this->service.assign(this->implementation, ip, native_acceptor, ec);
       detail::throw_error(ec);
     }
@@ -99,30 +99,30 @@ BOOST_CGI_NAMESPACE_BEGIN
     template<typename InternetProtocol>
     void open(const InternetProtocol& protocol)
     {
-      boost::system::error_code ec;
+      std::error_code ec;
       this->service.open(this->implementation, protocol, ec);
       detail::throw_error(ec);
     }
 
     /// Open the acceptor
     template<typename InternetProtocol>
-    boost::system::error_code
-      open(const InternetProtocol& protocol, boost::system::error_code& ec)
+    std::error_code
+      open(const InternetProtocol& protocol, std::error_code& ec)
     {
       return this->service.open(this->implementation, protocol, ec);
     }
 
     /// Set the acceptor to listen
-    void listen(int backlog = boost::asio::socket_base::max_connections)
+    void listen(int backlog = asio::socket_base::max_connections)
     {
-      boost::system::error_code ec;
+      std::error_code ec;
       this->service.listen(this->implementation, backlog, ec);
       detail::throw_error(ec);
     }
 
     /// Set the acceptor to listen
-    boost::system::error_code
-      listen(int backlog, boost::system::error_code& ec)
+    std::error_code
+      listen(int backlog, std::error_code& ec)
     {
       return this->service.listen(this->implementation, backlog, ec);
     }
@@ -130,20 +130,20 @@ BOOST_CGI_NAMESPACE_BEGIN
     template<typename Endpoint>
     void bind(Endpoint& ep)
     {
-      boost::system::error_code ec;
+      std::error_code ec;
       this->service.bind(this->implementation, ep, ec);
       detail::throw_error(ec);
     }
 
     template<typename Endpoint>
-    boost::system::error_code
-      bind(Endpoint& ep, boost::system::error_code& ec)
+    std::error_code
+      bind(Endpoint& ep, std::error_code& ec)
     {
       return this->service.bind(this->implementation, ep, ec);
     }
 
     /// Cancel all asynchronous operations associated with the acceptor.
-    boost::system::error_code
+    std::error_code
       cancel()
     {
       return this->service.cancel(this->implementation);
@@ -152,14 +152,14 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Close the acceptor
     void close()
     {
-      boost::system::error_code ec;
+      std::error_code ec;
       this->service.close(this->implementation, ec);
       detail::throw_error(ec);
     }
 
     /// Close the acceptor
-    boost::system::error_code
-      close(boost::system::error_code& ec)
+    std::error_code
+      close(std::error_code& ec)
     {
       return this->service.close(this->implementation, ec);
     }
@@ -167,15 +167,15 @@ BOOST_CGI_NAMESPACE_BEGIN
     template<typename InternetProtocol>
     void assign(InternetProtocol protocol, const native_handle_type& native_acceptor)
     {
-      boost::system::error_code ec;
+      std::error_code ec;
       this->service.assign(this->implementation, protocol, native_acceptor, ec);
       detail::throw_error(ec);
     }
 
     template<typename InternetProtocol>
-    boost::system::error_code
+    std::error_code
       assign(InternetProtocol protocol, const native_handle_type& native_acceptor
-            , boost::system::error_code& ec)
+            , std::error_code& ec)
     {
       return this->service.assign(this->implementation, protocol
                                  , native_acceptor, ec);
@@ -184,13 +184,13 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Accept one request and handle it with `handler`.
     int accept(accept_handler_type handler)
     {
-      boost::system::error_code ec;
+      std::error_code ec;
       int status = this->service.accept(this->implementation, handler, &this->implementation.endpoint_, ec);
       detail::throw_error(ec);
       return status;
     }
 
-    int accept(accept_handler_type handler, boost::system::error_code& ec)
+    int accept(accept_handler_type handler, std::error_code& ec)
     {
       return this->service.accept(this->implementation, handler, &this->implementation.endpoint_, ec);
     }
@@ -203,23 +203,23 @@ BOOST_CGI_NAMESPACE_BEGIN
     template<typename CommonGatewayRequest>
     void accept(CommonGatewayRequest& request)
     {
-      boost::system::error_code ec;
+      std::error_code ec;
       this->service.accept(this->implementation, request, &this->implementation.endpoint_, ec);
       detail::throw_error(ec);
     }
 
     /// Accept one request
     template<typename CommonGatewayRequest>
-    boost::system::error_code
-      accept(CommonGatewayRequest& request, boost::system::error_code& ec)
+    std::error_code
+      accept(CommonGatewayRequest& request, std::error_code& ec)
     {
       return this->service.accept(this->implementation, request, &this->implementation.endpoint_, ec);
     }
 
     template<typename CommonGatewayRequest>
-    boost::system::error_code
+    std::error_code
       accept(CommonGatewayRequest& request, endpoint_type& ep
-            , boost::system::error_code& ec)
+            , std::error_code& ec)
     {
       return this->service.accept(this->implementation, request, &ep, ec);
     }
@@ -234,14 +234,14 @@ BOOST_CGI_NAMESPACE_BEGIN
     endpoint_type
       local_endpoint()
     {
-      boost::system::error_code ec;
+      std::error_code ec;
       endpoint_type ep(this->service.local_endpoint(this->implementation, ec));
       detail::throw_error(ec);
       return ep;
     }
 
     endpoint_type
-      local_endpoint(boost::system::error_code& ec) const
+      local_endpoint(std::error_code& ec) const
     {
       return this->service.local_endpoint(this->implementation, ec);
     }

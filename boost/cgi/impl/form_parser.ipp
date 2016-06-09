@@ -24,11 +24,11 @@ BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
     BOOST_CGI_INLINE
-    boost::system::error_code
-      form_parser::parse(context ctx, boost::system::error_code& ec)
+    std::error_code
+      form_parser::parse(context ctx, std::error_code& ec)
     {
       context_ = &ctx;
-      
+
       BOOST_ASSERT(!ctx.content_type.empty());
 
       if (ctx.content_type.find(
@@ -47,8 +47,8 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     BOOST_CGI_INLINE
-    boost::system::error_code
-      form_parser::parse_url_encoded_form(boost::system::error_code& ec)
+    std::error_code
+      form_parser::parse_url_encoded_form(std::error_code& ec)
     {
      buffer_type& str(context_->buffer);
      string_type result;
@@ -104,8 +104,8 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     /// Parse a multipart form.
     BOOST_CGI_INLINE
-    boost::system::error_code
-      form_parser::parse_multipart_form(boost::system::error_code& ec)
+    std::error_code
+      form_parser::parse_multipart_form(std::error_code& ec)
     {
       parse_boundary_marker(ec);
       move_to_start_of_first_part(ec);
@@ -118,8 +118,8 @@ BOOST_CGI_NAMESPACE_BEGIN
 
 
     BOOST_CGI_INLINE
-    boost::system::error_code
-      form_parser::parse_form_part(boost::system::error_code& ec)
+    std::error_code
+      form_parser::parse_form_part(std::error_code& ec)
     {
       namespace algo = boost::algorithm;
 
@@ -130,10 +130,10 @@ BOOST_CGI_NAMESPACE_BEGIN
 
       std::size_t end = buffer.find("\r\n\r\n", offset);
       if (end == string_type::npos)
-        return ec = common::error::multipart_meta_data_not_terminated;
-      
+        return ec = std::make_error_code(common::error::multipart_meta_data_not_terminated);
+
       string_type meta (buffer.substr(offset,end-offset));
-      
+
       // sic - short-cut check for Content-Disposition.
       std::size_t pos1 = meta.find("isposition:"); // sic
       std::size_t pos2 = meta.find(";", pos1);
@@ -141,23 +141,23 @@ BOOST_CGI_NAMESPACE_BEGIN
       std::size_t pos4 = meta.find(";", pos3);
       std::size_t pos5 = meta.find("\r\n");
       std::size_t pos6 = meta.find("filename=", pos2);
-      
+
       if (pos3 == string_type::npos)
         pos3 = meta.find("\r\n");
       string_type field_name (meta.substr(pos3+5, pos4-pos3-5));
       algo::trim_if(field_name, algo::is_any_of("\" "));
-      
+
       common::form_part part;
       part.name = field_name;
       part.content_disposition = meta.substr(pos1+11, pos2-pos1-11);
 
       std::size_t next_pos = buffer.find(string_type("\r\n") + marker, end);
-      
+
       if (pos6 == string_type::npos)
       {
         string_type content (
            buffer.substr(meta.length()+4, next_pos-meta.length()-4));
-        
+
         // Load the data to the request's post map.
         part.value = content;
       }
@@ -197,7 +197,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       }
       // Load the data to the request's post map.
       context_->data_map.insert(std::make_pair(part.name.c_str(), part.value));
-      
+
       buffer.erase(0, next_pos+marker.length()+2);
       if (buffer.length() >= 2
         && buffer.substr(0,2) == "--")
@@ -209,15 +209,15 @@ BOOST_CGI_NAMESPACE_BEGIN
       else
       if (buffer.length() == 0)
         context_->bytes_left = 0;
-        
+
       buffer.erase(0,2);
 
       return ec;
     }
 
     BOOST_CGI_INLINE
-    boost::system::error_code
-      form_parser::move_to_start_of_first_part(boost::system::error_code& ec)
+    std::error_code
+      form_parser::move_to_start_of_first_part(std::error_code& ec)
     {
       string_type marker(
         string_type("--") + context_->boundary_markers.front() + "\r\n");
@@ -229,19 +229,19 @@ BOOST_CGI_NAMESPACE_BEGIN
         ec = common::error::multipart_form_boundary_not_found;
       else
         buffer.erase(0, pos+marker.length());
-      
-      ec = boost::system::error_code();
+
+      ec = std::error_code();
 
       return ec;
     }
 
     BOOST_CGI_INLINE
-    boost::system::error_code
-      form_parser::parse_boundary_marker(boost::system::error_code& ec)
+    std::error_code
+      form_parser::parse_boundary_marker(std::error_code& ec)
     {
       string_type& ctype(context_->content_type);
       string_type& marker(context_->boundary_marker);
-      
+
       marker.assign(ctype.substr(ctype.find("boundary=")+9));
       boost::algorithm::trim(marker);
       if (marker.empty())
@@ -253,7 +253,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
  } // namespace common
- 
+
 BOOST_CGI_NAMESPACE_END
 
 #endif // CGI_DETAIL_FORM_PARSER_IPP_INCLUDED__

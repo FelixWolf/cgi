@@ -18,8 +18,8 @@
 ///////////////////////////////////////////////////////////
 #include <boost/regex.hpp>
 #include <boost/function.hpp>
-#include <boost/asio/error.hpp>
-#include <boost/asio/buffer.hpp>
+#include <asio/error.hpp>
+#include <asio/buffer.hpp>
 #include <boost/algorithm/string/find.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/common/map.hpp"
@@ -71,14 +71,14 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// The callback functor to read more data.
     typedef
       boost::function<
-        std::size_t (boost::system::error_code&)
+        std::size_t (std::error_code&)
       >
     callback_type;
 
     typedef common::map                     map_type;
     typedef common::form_part::string_type  string_type;
     typedef common::form_part::buffer_type  buffer_type;
-    typedef boost::asio::mutable_buffers_1  mutable_buffers_type;
+    typedef asio::mutable_buffers_1         mutable_buffers_type;
 
     /// The context used for parsing.
     struct context
@@ -114,38 +114,38 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
     
     /// Run the parser on the given `context`.
-    boost::system::error_code 
-      parse(context ctx, boost::system::error_code& ec);
+    std::error_code 
+      parse(context ctx, std::error_code& ec);
 
     /// URL-encoded forms.
     /**
      * Parse forms where the content-type is "application/www-url-encoded".
      */
-    boost::system::error_code
-      parse_url_encoded_form(boost::system::error_code& ec);
+    std::error_code
+      parse_url_encoded_form(std::error_code& ec);
 
     /// Parse a multipart form.
     /**
      * Parse forms where the content-type is "multipart/form-data".
      */
-    boost::system::error_code
-      parse_multipart_form(boost::system::error_code& ec);
+    std::error_code
+      parse_multipart_form(std::error_code& ec);
 
     /// Parse a single form part.
-    boost::system::error_code
-      parse_form_part(boost::system::error_code& ec);
+    std::error_code
+      parse_form_part(std::error_code& ec);
 
     /// Erase any front-cruft on the form data.
     /**
      * In multipart forms, any characters that precede the first form
      * boundary are ignored. This function erases those characters.
      */
-    boost::system::error_code
-      move_to_start_of_first_part(boost::system::error_code& ec);
+    std::error_code
+      move_to_start_of_first_part(std::error_code& ec);
 
     /// Get the boundary marker from the CONTENT_TYPE header.
-    boost::system::error_code
-      parse_boundary_marker(boost::system::error_code& ec);
+    std::error_code
+      parse_boundary_marker(std::error_code& ec);
 
 private:
     context* context_;

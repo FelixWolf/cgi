@@ -16,7 +16,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     template<typename Request, typename Response>
     int commit(Request& req, Response& resp, int program_status = 0)
     {
-      boost::system::error_code ec;
+      std::error_code ec;
       int ret (commit(req, resp, program_status, ec));
       detail::throw_error(ec);
       return ret;
@@ -28,7 +28,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      */
     template<typename Request, typename Response>
     int commit(Request& req, Response& resp, int program_status
-              , boost::system::error_code& ec)
+              , std::error_code& ec)
     {
       typedef typename Request::string_type string_type  __attribute__((__unused__));
 #ifdef BOOST_CGI_ENABLE_SESSIONS

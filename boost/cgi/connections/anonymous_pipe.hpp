@@ -51,7 +51,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     typedef boost::shared_ptr<self_type>           pointer;
     typedef HANDLE native_handle_type;
 
-      basic_connection(boost::asio::io_service& ios)
+      basic_connection(asio::io_service& ios)
       : io_service(ios)
       , file_handle(INVALID_HANDLE_VALUE)
       , do_io_(true)
@@ -73,18 +73,18 @@ BOOST_CGI_NAMESPACE_BEGIN
         io_thread_->join();
     }
 
-    static pointer create(boost::asio::io_service& ios)
+    static pointer create(asio::io_service& ios)
     {
       return pointer(new self_type(ios));
     }
 
     void assign(native_handle_type const &handle)
     {
-        boost::system::error_code ec;
+        std::error_code ec;
         assign(handle, ec);
     }
 
-    boost::system::error_code assign(native_handle_type const &handle, boost::system::error_code &ec)
+    std::error_code assign(native_handle_type const &handle, std::error_code &ec)
     {
       if (is_open())
         ec = close(ec);
@@ -100,11 +100,11 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     void close()
     {
-      boost::system::error_code ec;
+      std::error_code ec;
       close(ec);
     }
 
-    boost::system::error_code close(boost::system::error_code &ec)
+    std::error_code close(std::error_code &ec)
     {
       /*
        * Make sure that the client (ie. a Web Server in this case) has
@@ -112,13 +112,13 @@ BOOST_CGI_NAMESPACE_BEGIN
        */
       if (!::FlushFileBuffers(file_handle))
       {
-        ec = boost::system::error_code(::GetLastError(), boost::system::system_category());
+        ec = std::error_code(::GetLastError(), std::system_category());
         return ec;
       }
 
       if (!::DisconnectNamedPipe(file_handle))
       {
-        ec =  boost::system::error_code(::GetLastError(), boost::system::system_category());
+        ec =  std::error_code(::GetLastError(), std::system_category());
         return ec;
       }
 
@@ -129,7 +129,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     template<typename MutableBufferSequence>
     std::size_t read_some(const MutableBufferSequence& buffers)
     {
-      boost::system::error_code ec;
+      std::error_code ec;
       std::size_t bytes_read = read_some(buffers, ec);
       detail::throw_error(ec);
       return bytes_read;
@@ -137,9 +137,9 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     template<typename MutableBufferSequence>
     std::size_t read_some(const MutableBufferSequence& buffers
-                         , boost::system::error_code& ec)
+                         , std::error_code& ec)
     {
-      ec = boost::system::error_code();
+      ec = std::error_code();
       typename MutableBufferSequence::const_iterator iter = buffers.begin();
       typename MutableBufferSequence::const_iterator end = buffers.end();
       DWORD i = 0;
@@ -148,10 +148,10 @@ BOOST_CGI_NAMESPACE_BEGIN
       size_t total_bytes_transferred = 0;
       for (; !ec && iter != end && i < max_buffers; ++iter, ++i)
       {
-        boost::asio::mutable_buffer buffer(*iter);
-        buffer_size = boost::asio::buffer_size(buffer);
+        asio::mutable_buffer buffer(*iter);
+        buffer_size = asio::buffer_size(buffer);
         bytes_transferred = read_some(
-          boost::asio::buffer_cast<char*>(buffer), buffer_size , ec);
+          asio::buffer_cast<char*>(buffer), buffer_size , ec);
         if (bytes_transferred < buffer_size)
           return bytes_transferred;
         total_bytes_transferred += buffer_size;
@@ -160,21 +160,21 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     std::size_t read_some(char* buf, std::size_t len
-        , boost::system::error_code& ec)
+        , std::error_code& ec)
     {
-      ec = boost::system::error_code();
+      ec = std::error_code();
       DWORD bytesRead;
       int ret = -1;
 
       if (::ReadFile(file_handle, buf, DWORD(len), &bytesRead, NULL))
         ret = bytesRead;
       else
-        ec = boost::system::error_code(
+        ec = std::error_code(
                 ::GetLastError(), 
 #if BOOST_VERSION < 104400
-                boost::system::system_category);
+                std::system_category);
 #else
-                boost::system::system_category());
+                std::system_category());
 #endif
 
       return ret;
@@ -195,36 +195,36 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     template<typename ConstBufferSequence>
     std::size_t write_some(ConstBufferSequence& buf
-                          , boost::system::error_code& ec)
+                          , std::error_code& ec)
     {
-      ec = boost::system::error_code();
+      ec = std::error_code();
       std::size_t bytes_transferred(0);
       for(typename ConstBufferSequence::const_iterator i = buf.begin(),
           end (buf.end())
          ; !ec && i != end; ++i)
       {
-        std::size_t buf_len = boost::asio::buffer_size(*i);
-        bytes_transferred += write_some(boost::asio::buffer_cast<const char *>(*i), buf_len, ec);
+        std::size_t buf_len = asio::buffer_size(*i);
+        bytes_transferred += write_some(asio::buffer_cast<const char *>(*i), buf_len, ec);
       }
       return bytes_transferred;
     }
 
     std::size_t write_some(const char* buf, std::size_t len
-                          , boost::system::error_code& ec)
+                          , std::error_code& ec)
     {
-      ec = boost::system::error_code();
+      ec = std::error_code();
       DWORD bytesWritten;
       int ret = -1;
 
       if (::WriteFile(file_handle, buf, DWORD(len), &bytesWritten, NULL))
         ret = bytesWritten;
       else
-        ec = boost::system::error_code(
+        ec = std::error_code(
                 ::GetLastError(),
 #if BOOST_VERSION < 104400
-                boost::system::system_category);
+                std::system_category);
 #else
-                boost::system::system_category());
+                std::system_category());
 #endif
 
       return ret;
@@ -243,15 +243,15 @@ BOOST_CGI_NAMESPACE_BEGIN
       io_.notify_one();
     }
 
-    boost::asio::io_service& io_service;
+    asio::io_service& io_service;
     native_handle_type file_handle;
 
     private:
       // Due to some web servers giving a pipe handle that does not have FILE_FLAG_OVERLAPPED, and not being able
       // to upgrade handle by using ReOpenFile() due to pending I/O (the client starts writing before
       // ConnectNamedPipe() even gets called) then we have to emulate it poorly with a worker thread.
-      typedef boost::function<void (const boost::system::error_code&, std::size_t)> handler_t;
-      typedef std::deque<boost::asio::mutable_buffer> mutable_buffers_t;
+      typedef boost::function<void (const std::error_code&, std::size_t)> handler_t;
+      typedef std::deque<asio::mutable_buffer> mutable_buffers_t;
       struct read_context
       {
         mutable_buffers_t buffers;
@@ -259,7 +259,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       };
       typedef std::deque<std::unique_ptr<read_context>> read_queue_t;
 
-      typedef std::deque<boost::asio::const_buffer> const_buffers_t;
+      typedef std::deque<asio::const_buffer> const_buffers_t;
       struct write_context
       {
         const_buffers_t buffers;
@@ -310,7 +310,7 @@ BOOST_CGI_NAMESPACE_BEGIN
                   if (!do_io_)
                       return;
 
-                  boost::system::error_code ec;
+                  std::error_code ec;
                   std::size_t bytes_transfered = write_some(cntxt->buffers, ec);
                   handler_t handler = cntxt->handler;
                   this->io_service.post([=]() -> void
@@ -336,7 +336,7 @@ BOOST_CGI_NAMESPACE_BEGIN
               if (!do_io_)
                 return;
 
-              boost::system::error_code ec;
+              std::error_code ec;
               std::size_t bytes_transfered = read_some(cntxt->buffers, ec);
               handler_t handler = cntxt->handler;
               io_service.post([=]() -> void

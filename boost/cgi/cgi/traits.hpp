@@ -9,7 +9,7 @@
 #ifndef BOOST_CGI_CGI_TRAITS_HPP_INCLUDED_
 #define BOOST_CGI_CGI_TRAITS_HPP_INCLUDED_
 
-#include <boost/asio/ip/tcp.hpp>
+#include <asio/ip/tcp.hpp>
 #include <boost/none.hpp>
 #include <boost/config.hpp>
 ///////////////////////////////////////////////////////////
@@ -64,8 +64,8 @@ BOOST_CGI_NAMESPACE_BEGIN
       typedef std::basic_string<char_type>           string_type;
       typedef string_type                            buffer_type;
       typedef boost::array<unsigned char, 8>         header_buffer_type;
-      typedef boost::asio::const_buffers_1           const_buffers_type;
-      typedef boost::asio::mutable_buffers_1         mutable_buffers_type;
+      typedef asio::const_buffers_1                  const_buffers_type;
+      typedef asio::mutable_buffers_1                mutable_buffers_type;
 #ifdef BOOST_CGI_ENABLE_SESSIONS
       typedef basic_session<
                 std::map<string_type, string_type>

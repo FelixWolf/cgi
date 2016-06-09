@@ -14,7 +14,7 @@
 #include <boost/mpl/int.hpp>
 #include <boost/array.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/asio/buffer.hpp>
+#include <asio/buffer.hpp>
 #include "boost/cgi/config.hpp"
 
 // NOTE: CamelCase style mimicks the FastCGI specification
@@ -102,8 +102,8 @@ BOOST_CGI_NAMESPACE_BEGIN
       } impl;
       
     public:
-      typedef boost::asio::const_buffers_1   const_buffers_type;
-      typedef boost::asio::mutable_buffers_1 mutable_buffers_type;
+      typedef asio::const_buffers_1   const_buffers_type;
+      typedef asio::mutable_buffers_1 mutable_buffers_type;
 
       Header()
       {
@@ -118,14 +118,14 @@ BOOST_CGI_NAMESPACE_BEGIN
       
       mutable_buffers_type data()
       {
-        return boost::asio::buffer(
+        return asio::buffer(
             static_cast<void*>(&impl)
           , sizeof(impl));
       }
 
       const_buffers_type data() const 
       {
-        return boost::asio::buffer(
+        return asio::buffer(
             static_cast<const void*>(&impl)
           , sizeof(impl));
       }
@@ -245,7 +245,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       } impl;
 
     public:
-      typedef boost::asio::const_buffers_1   const_buffers_type;
+      typedef asio::const_buffers_1   const_buffers_type;
 
       EndRequestBody() {}
 
@@ -269,7 +269,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       
       const_buffers_type data() const 
       {
-        return boost::asio::buffer(
+        return asio::buffer(
             static_cast<const void*>(&impl)
           , sizeof(impl));
       }

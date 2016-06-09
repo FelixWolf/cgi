@@ -9,13 +9,13 @@
 #ifndef CGI_READ_HPP_INCLUDED
 #define CGI_READ_HPP_INCLUDED
 
-#include <boost/asio/read.hpp>
+#include <asio/read.hpp>
 
 BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
-  using boost::asio::read;
-  using boost::asio::async_read;
+  using asio::read;
+  using asio::async_read;
 
  } // namespace common
 BOOST_CGI_NAMESPACE_END

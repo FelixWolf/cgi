@@ -9,7 +9,7 @@
 #ifndef BOOST_CGI_PROTOCOL_TRAITS_HPP_INCLUDED_
 #define BOOST_CGI_PROTOCOL_TRAITS_HPP_INCLUDED_
 
-#include <boost/asio/ip/tcp.hpp>
+#include <asio/ip/tcp.hpp>
 #include <boost/none.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/config.hpp>

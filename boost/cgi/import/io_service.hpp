@@ -13,12 +13,12 @@
 //#pragma once
 //#endif
 
-#include <boost/asio/io_service.hpp>
+#include <asio/io_service.hpp>
 
 BOOST_CGI_NAMESPACE_BEGIN
  namespace common {
 
-  using boost::asio::io_service;
+  using asio::io_service;
 
  } // namespace common
 BOOST_CGI_NAMESPACE_END

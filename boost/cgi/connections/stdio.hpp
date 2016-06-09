@@ -19,7 +19,7 @@
 #endif // BOOST_WINDOWS
 ///////////////////////////////////////////////////////////
 #include <boost/system/error_code.hpp>
-#include <boost/asio.hpp>
+#include <asio.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/error.hpp"
 #include "boost/cgi/common/tags.hpp"
@@ -81,13 +81,13 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     template<typename MutableBufferSequence>
     std::size_t read_some(const MutableBufferSequence buf
-                         , boost::system::error_code& ec)
+                         , std::error_code& ec)
     {
-      if (std::fread(boost::asio::buffer_cast<void *>(buf)
-                    , boost::asio::buffer_size(buf)
+      if (std::fread(asio::buffer_cast<void *>(buf)
+                    , asio::buffer_size(buf)
                     , 1, stdin))
       {
-        return strlen(boost::asio::buffer_cast<char *>(buf));
+        return strlen(asio::buffer_cast<char *>(buf));
       }
 
       if (std::feof(stdin))
@@ -103,26 +103,26 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     template<typename ConstBufferSequence>
     std::size_t write_some(ConstBufferSequence const& buf
-                          , boost::system::error_code& ec)
+                          , std::error_code& ec)
     {
-      ec = boost::system::error_code();
+      ec = std::error_code();
       
       std::size_t bytes_transferred(0);
       for(typename ConstBufferSequence::const_iterator i = buf.begin(),
           end (buf.end())
          ; !ec && i != end; ++i)
       {
-        std::size_t buf_len = boost::asio::buffer_size(*i);
+        std::size_t buf_len = asio::buffer_size(*i);
         bytes_transferred += buf_len;
-        //int ret(fputs(boost::asio::buffer_cast<const char*>(*i), stdout));
+        //int ret(fputs(asio::buffer_cast<const char*>(*i), stdout));
         //if (ret == EOF)
         //{
         //  return ::BOOST_CGI_NAMESPACE::error::broken_pipe;
         //}
         //std::cerr<< "[buf] " 
-        // << std::string(boost::asio::buffer_cast<const char*>(*i), buf_len)
+        // << std::string(asio::buffer_cast<const char*>(*i), buf_len)
         // << std::endl;
-        if (!std::fwrite(boost::asio::buffer_cast<const void *>(*i)
+        if (!std::fwrite(asio::buffer_cast<const void *>(*i)
                        , buf_len, 1, stdout))
         {
           if (std::feof(stdout))

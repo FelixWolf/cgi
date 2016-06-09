@@ -13,7 +13,7 @@
 
 #include <boost/ref.hpp>
 #include <boost/bind.hpp>
-#include <boost/asio.hpp>
+#include <asio.hpp>
 #include <boost/thread.hpp>
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
@@ -107,7 +107,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
      explicit acceptor_service_impl(::BOOST_CGI_NAMESPACE::common::io_service& ios)
        : detail::service_base< ::BOOST_CGI_NAMESPACE::fcgi::acceptor_service_impl<Protocol> >(ios)
-       , acceptor_service_(boost::asio::use_service<acceptor_service_type>(ios))
+       , acceptor_service_(asio::use_service<acceptor_service_type>(ios))
        , strand_(ios)
      {
      }
@@ -119,12 +119,12 @@ BOOST_CGI_NAMESPACE_BEGIN
      }
 
      /// Default-initialize the acceptor.
-     boost::system::error_code
-       default_init(implementation_type& impl, boost::system::error_code& ec)
+     std::error_code
+       default_init(implementation_type& impl, std::error_code& ec)
      {
        // I've never got the default initialisation working on Windows...
 #if ! defined(BOOST_WINDOWS)
-       return acceptor_service_.assign(impl.acceptor_, boost::asio::ip::tcp::v4()
+       return acceptor_service_.assign(impl.acceptor_, asio::ip::tcp::v4()
                                       , 0, ec);
 #endif
        return ec;
@@ -170,35 +170,35 @@ BOOST_CGI_NAMESPACE_BEGIN
      }
 
      /// Open a new *socket* acceptor implementation.
-     boost::system::error_code
+     std::error_code
        open(implementation_type& impl, const native_protocol_type& protocol
-           , boost::system::error_code& ec)
+           , std::error_code& ec)
      {
        return acceptor_service_.open(impl.acceptor_, protocol, ec);
      }
 
      template<typename Endpoint>
-     boost::system::error_code
+     std::error_code
        bind(implementation_type& impl, const Endpoint& endpoint
-           , boost::system::error_code& ec)
+           , std::error_code& ec)
      {
        acceptor_service_.set_option(impl.acceptor_,
-           boost::asio::socket_base::reuse_address(true), ec);
+           asio::socket_base::reuse_address(true), ec);
        return acceptor_service_.bind(impl.acceptor_, endpoint, ec);
      }
 
      /// Assign an existing native acceptor to a *socket* acceptor.
-     boost::system::error_code
+     std::error_code
        assign(implementation_type& impl, const native_protocol_type& protocol
              , const native_handle_type& native_acceptor
-             , boost::system::error_code& ec)
+             , std::error_code& ec)
      {
        return acceptor_service_.assign(impl.acceptor_, protocol
                                       , native_acceptor, ec);
      }
 
-     boost::system::error_code
-       listen(implementation_type& impl, int backlog, boost::system::error_code& ec)
+     std::error_code
+       listen(implementation_type& impl, int backlog, std::error_code& ec)
      {
        return acceptor_service_.listen(impl.acceptor_, backlog, ec);
      }
@@ -241,7 +241,7 @@ BOOST_CGI_NAMESPACE_BEGIN
          impl.service_->post(
            strand_.wrap(
              boost::bind(&self_type::handle_accept
-                 , this, boost::ref(impl), new_request, handler, boost::system::error_code()
+                 , this, boost::ref(impl), new_request, handler, std::error_code()
                )
              )
            );
@@ -250,7 +250,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
      void handle_accept(
          implementation_type& impl, request_ptr new_request,
-         accept_handler_type handler, const boost::system::error_code& ec __attribute__((__unused__))
+         accept_handler_type handler, const std::error_code& ec __attribute__((__unused__))
       )
      {
        new_request->status(common::accepted);
@@ -276,7 +276,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      }
 
      int accept(implementation_type& impl, accept_handler_type handler
-             , endpoint_type* endpoint, boost::system::error_code& ec)
+             , endpoint_type* endpoint, std::error_code& ec)
      {
        typedef typename std::set<request_ptr>::iterator iter_t;
        typedef std::pair<iter_t, bool> pair_t;
@@ -324,9 +324,9 @@ BOOST_CGI_NAMESPACE_BEGIN
 
      /// Accepts one request.
      template<typename CommonGatewayRequest>
-     boost::system::error_code
+     std::error_code
        accept(implementation_type& impl, CommonGatewayRequest& request
-             , endpoint_type* endpoint, boost::system::error_code& ec)
+             , endpoint_type* endpoint, std::error_code& ec)
      {
        BOOST_ASSERT
        ( ! request.is_open()
@@ -364,18 +364,18 @@ BOOST_CGI_NAMESPACE_BEGIN
      }
 
      /// Close the acceptor (not implemented yet).
-     boost::system::error_code
-       close(implementation_type& impl, boost::system::error_code& ec)
+     std::error_code
+       close(implementation_type& impl, std::error_code& ec)
      {
 #if BOOST_VERSION < 104400
-       return boost::system::error_code(348, boost::system::system_category);
+       return std::error_code(348, std::system_category);
 #else
-       return boost::system::error_code(348, boost::system::system_category());
+       return std::error_code(348, std::system_category());
 #endif
      }
 
      typename implementation_type::endpoint_type
-       local_endpoint(implementation_type& impl, boost::system::error_code& ec)
+       local_endpoint(implementation_type& impl, std::error_code& ec)
      {
        return acceptor_service_.local_endpoint(impl.acceptor_, ec);
      }
@@ -389,7 +389,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      bool
      is_cgi(implementation_type& impl)
      {
-       boost::system::error_code ec;
+       std::error_code ec;
        socklen_t len (
          static_cast<socklen_t>(local_endpoint(impl,ec).capacity()) );
        int check (
@@ -424,7 +424,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
        // If we can reuse this request's connection, return.
        if (request.client().keep_connection())
-         return handler(boost::system::error_code());
+         return handler(std::error_code());
 
        // ...otherwise accept a new connection (asynchronously).
        acceptor_service_.async_accept(impl.acceptor_,
@@ -435,7 +435,7 @@ BOOST_CGI_NAMESPACE_BEGIN
    public:
      /// The underlying socket acceptor service.
      acceptor_service_type&          acceptor_service_;
-     boost::asio::io_service::strand strand_;
+     asio::io_service::strand strand_;
    };
 
  } // namespace fcgi

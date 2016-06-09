@@ -9,7 +9,7 @@
 #ifndef BOOST_CGI_SCGI_TRAITS_HPP_INCLUDED_
 #define BOOST_CGI_SCGI_TRAITS_HPP_INCLUDED_
 
-#include <boost/asio/ip/tcp.hpp>
+#include <asio/ip/tcp.hpp>
 #include <boost/none.hpp>
 #include <boost/config.hpp>
 ///////////////////////////////////////////////////////////
@@ -89,8 +89,8 @@ BOOST_CGI_NAMESPACE_BEGIN
       typedef scgi_request_acceptor_service<
                   protocol_type
               >                                      acceptor_service;
-      typedef boost::asio::ip::tcp                   native_protocol_type;
-      typedef boost::asio::socket_acceptor_service<
+      typedef asio::ip::tcp                          native_protocol_type;
+      typedef asio::socket_acceptor_service<
                   native_protocol_type
               >                                      acceptor_service_type;
       typedef 
@@ -102,8 +102,8 @@ BOOST_CGI_NAMESPACE_BEGIN
       typedef boost::none_t                          header_type;
 
       typedef boost::array<unsigned char, 8>         header_buffer_type;
-      typedef boost::asio::const_buffers_1           const_buffers_type;
-      typedef boost::asio::mutable_buffers_1         mutable_buffers_type;
+      typedef asio::const_buffers_1                  const_buffers_type;
+      typedef asio::mutable_buffers_1                mutable_buffers_type;
     };
 
  } // namespace common

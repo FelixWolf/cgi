@@ -10,7 +10,7 @@
 #define CGI_CONNECTIONS_TCP_SOCKET_HPP_INCLUDED__
 
 #include <boost/shared_ptr.hpp>
-#include <boost/asio/ip/tcp.hpp>
+#include <asio/ip/tcp.hpp>
 ///////////////////////////////////////////////////////////
 #include "boost/cgi/common/tags.hpp"
 #include "boost/cgi/basic_connection.hpp"
@@ -28,7 +28,7 @@ BOOST_CGI_NAMESPACE_BEGIN
   public:
     typedef basic_connection<tags::tcp_socket> type;
     typedef boost::shared_ptr<type>            pointer;
-    typedef boost::asio::ip::tcp::socket       next_layer_type;
+    typedef asio::ip::tcp::socket              next_layer_type;
 
     basic_connection(io_service& ios)
       : sock_(ios)
@@ -58,7 +58,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     template<typename MutableBufferSequence>
     std::size_t read_some(const MutableBufferSequence& buf
-                         , boost::system::error_code& ec)
+                         , std::error_code& ec)
     {
       return sock_.read_some(buf, ec);
     }
@@ -77,7 +77,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     template<typename ConstBufferSequence>
     std::size_t write_some(ConstBufferSequence& buf
-                          , boost::system::error_code& ec)
+                          , std::error_code& ec)
     {
       return sock_.write_some(buf, ec);
     }

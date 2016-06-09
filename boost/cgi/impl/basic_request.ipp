@@ -20,9 +20,9 @@
 #include <boost/assert.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/asio/io_service.hpp>
+#include <asio/io_service.hpp>
 #include <boost/system/error_code.hpp>
-#include <boost/asio/basic_io_object.hpp>
+#include <asio/basic_io_object.hpp>
 ///////////////////////////////////////////////////////////
 // **FIXME** Half of these are probably useless
 #include "boost/cgi/detail/protocol_traits.hpp"
@@ -49,8 +49,8 @@ BOOST_CGI_NAMESPACE_BEGIN
    * Note: By default, synchronous protocols (ie. cgi) auto-load AND parse
    * STDIN,whereas async protocols don't.
    *
-   * Note: The alternative functions which take a boost::system::error_code are
-   * the non-throwing versions. Instead of a boost::system::system_error being
+   * Note: The alternative functions which take a std::error_code are
+   * the non-throwing versions. Instead of a std::system_error being
    * thrown in case of an error, the passed error_code will be set to the value
    * of the error, s.t. if (error) evaluates to true.`
    * 
@@ -67,7 +67,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       : basic_io_object<service_type>(impl.service_->io_service())
     {
       set_protocol_service(*impl.service_);
-      boost::system::error_code ec;
+      std::error_code ec;
       this->service.begin_request_helper(this->implementation
                                         , impl.header_buf_, ec);
       detail::throw_error(ec);
@@ -76,7 +76,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Make a new mutiplexed request from an existing connection.
     // Won't throw.
   template<typename RequestService, typename ProtocolService, typename Acceptor>
-  basic_request<RequestService,ProtocolService,Acceptor>::    basic_request(implementation_type& impl, boost::system::error_code& ec)
+  basic_request<RequestService,ProtocolService,Acceptor>::    basic_request(implementation_type& impl, std::error_code& ec)
       : basic_io_object<service_type>(impl.service_->io_service())
     {
       set_protocol_service(*impl.service_);
@@ -116,21 +116,21 @@ BOOST_CGI_NAMESPACE_BEGIN
     // Throwing semantics
     void load(bool parse_stdin = false)
     {
-      boost::system::error_code ec;
+      std::error_code ec;
       this->service.load(this->implementation, parse_stdin, ec);
       detail::throw_error(ec);
     }
 
     // Error-code semantics (**FIXME**)
-    boost::system::error_code&
-      load(bool parse_stdin, boost::system::error_code& ec)
+    std::error_code&
+      load(bool parse_stdin, std::error_code& ec)
     {
       return this->service.load(this->implementation, parse_stdin, ec);
     }
 
     // Error-code semantics (**FIXME**)
-    boost::system::error_code&
-      load(boost::system::error_code& ec, bool parse_stdin = false)
+    std::error_code&
+      load(std::error_code& ec, bool parse_stdin = false)
     {
       return this->service.load(this->implementation, parse_stdin, ec);
     }
@@ -171,7 +171,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       //BOOST_ASSERT( request_status_ != status_type::ended );
 
       //this->service.set_status(this->implementation, http_status);
-      boost::system::error_code ec;
+      std::error_code ec;
       this->service.close(this->implementation, http_status,
           program_status, ec);
       detail::throw_error(ec);
@@ -180,7 +180,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     int close(common::http::status_code http_status
              , int program_status
-             , boost::system::error_code& ec)
+             , std::error_code& ec)
     {
       return this->service.close(this->implementation, http_status
                                 , program_status, ec);
@@ -220,14 +220,14 @@ BOOST_CGI_NAMESPACE_BEGIN
     /// Read some data into the request, parsing if necessary.
     void read_some()
     {
-      boost::system::error_code ec;
+      std::error_code ec;
       this->service.read_some(this->implementation, ec);
       detail::throw_error(ec);
     }
 
     /// Read some data into the request, parsing if necessary.
     std::size_t
-    read_some(boost::system::error_code& ec)
+    read_some(std::error_code& ec)
     {
       return this->service.read_some(this->implementation, ec);
     }
@@ -237,7 +237,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     template<typename MutableBufferSequence>
     void read_some(const MutableBufferSequence& buf)
     {
-      boost::system::error_code ec;
+      std::error_code ec;
       this->service.read_some(this->implementation, buf, ec);
       detail::throw_error(ec);
     }
@@ -247,7 +247,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     template<typename MutableBufferSequence>
     std::size_t
     read_some(const MutableBufferSequence& buf
-             , boost::system::error_code& ec)
+             , std::error_code& ec)
     {
       return this->service.read_some(this->implementation, buf, ec);
     }
@@ -259,7 +259,7 @@ BOOST_CGI_NAMESPACE_BEGIN
      * Set the output sink as `stdout_`, `stderr_`, or `stdout_ | stderr_`
      */
     /*
-    void set_output(BOOST_CGI_NAMESPACE::sink dest, boost::system::error_code& ec)
+    void set_output(BOOST_CGI_NAMESPACE::sink dest, std::error_code& ec)
     {
       this->service(this->implementation, dest, ec);
     }

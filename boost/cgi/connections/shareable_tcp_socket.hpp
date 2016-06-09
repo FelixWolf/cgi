@@ -12,7 +12,7 @@
 #include <map>
 #include <set>
 ///////////////////////////////////////////////////////////
-#include <boost/asio.hpp>
+#include <asio.hpp>
 #include <boost/thread.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/foreach.hpp>
@@ -51,7 +51,7 @@ BOOST_CGI_NAMESPACE_BEGIN
     struct condition_type : public boost::condition_variable
         { typedef boost::shared_ptr<boost::condition_variable> pointer; };
   	typedef boost::mutex::scoped_lock                 scoped_lock_type;
-    typedef boost::asio::ip::tcp::socket              next_layer_type;
+    typedef asio::ip::tcp::socket                     next_layer_type;
 
     typedef common::protocol_traits<tags::fcgi>       traits;
     /** FastCGI specific stuff **/
@@ -123,7 +123,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     template<typename MutableBufferSequence>
     std::size_t read_some(const MutableBufferSequence& buf
-                         , boost::system::error_code& ec)
+                         , std::error_code& ec)
     {
       return sock_.read_some(buf, ec);
     }
@@ -142,7 +142,7 @@ BOOST_CGI_NAMESPACE_BEGIN
 
     template<typename ConstBufferSequence>
     std::size_t write_some(ConstBufferSequence& buf
-                          , boost::system::error_code& ec)
+                          , std::error_code& ec)
     {
       return sock_.write_some(buf, ec);
     }
@@ -162,8 +162,8 @@ BOOST_CGI_NAMESPACE_BEGIN
     mutex_type& mutex()         { return mutex_;     }
     condition_type& condition() { return condition_; }
 
-    boost::system::error_code
-      get_slot(boost::uint16_t id, boost::system::error_code& ec)
+    std::error_code
+      get_slot(boost::uint16_t id, std::error_code& ec)
     {
       if (requests_.at(id-1)) // duplicate request!
       {
@@ -176,9 +176,9 @@ BOOST_CGI_NAMESPACE_BEGIN
       return ec;
     }
 
-    boost::system::error_code
+    std::error_code
       add_request(boost::uint16_t id, request_type* req, bool on_heap
-                 , boost::system::error_code& ec)
+                 , std::error_code& ec)
     {
       requests_.at(id-1) = req;
       if (on_heap)
@@ -187,8 +187,8 @@ BOOST_CGI_NAMESPACE_BEGIN
     }
 
     //template<typename RequestImpl>
-    //boost::system::error_code
-    //  multiplex(RequestImpl& impl, boost::system::error_code& ec)
+    //std::error_code
+    //  multiplex(RequestImpl& impl, std::error_code& ec)
     //{
     //  
     //  return ec;
