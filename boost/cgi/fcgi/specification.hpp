@@ -100,10 +100,10 @@ BOOST_CGI_NAMESPACE_BEGIN
         unsigned char paddingLength_;
         unsigned char reserved_;
       } impl;
-      
+
     public:
-      typedef boost::asio::const_buffers_1   const_buffers_type;
-      typedef boost::asio::mutable_buffers_1 mutable_buffers_type;
+      typedef boost::asio::const_buffer      const_buffers_type;
+      typedef boost::asio::mutable_buffer    mutable_buffers_type;
 
       Header()
       {
@@ -115,7 +115,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       {
         reset(t, id, len);
       }
-      
+
       mutable_buffers_type data()
       {
         return boost::asio::buffer(
@@ -123,7 +123,7 @@ BOOST_CGI_NAMESPACE_BEGIN
           , sizeof(impl));
       }
 
-      const_buffers_type data() const 
+      const_buffers_type data() const
       {
         return boost::asio::buffer(
             static_cast<const void*>(&impl)
@@ -245,7 +245,7 @@ BOOST_CGI_NAMESPACE_BEGIN
       } impl;
 
     public:
-      typedef boost::asio::const_buffers_1   const_buffers_type;
+      typedef boost::asio::const_buffer      const_buffers_type;
 
       EndRequestBody() {}
 
@@ -266,8 +266,8 @@ BOOST_CGI_NAMESPACE_BEGIN
 
         memset(impl.reserved_, 0, sizeof(impl.reserved_));
       }
-      
-      const_buffers_type data() const 
+
+      const_buffers_type data() const
       {
         return boost::asio::buffer(
             static_cast<const void*>(&impl)
@@ -351,10 +351,10 @@ BOOST_CGI_NAMESPACE_BEGIN
         impl.body_.reset( (unsigned char)type ); // not sure why this is C-style
       }
     };
-    
+
 #endif
-  } // namespace detail  
-  
+  } // namespace detail
+
   namespace specification {
 
     /// Define the FastCGI spec using types.
@@ -369,26 +369,26 @@ BOOST_CGI_NAMESPACE_BEGIN
     struct header_length
       : boost::mpl::int_<8>
     {};
-    
+
     struct listensock_fileno
       : boost::mpl::int_<0>
     {};
 
     static const unsigned char keep_connection = 1;
-    
+
     struct null_request_id
       : boost::mpl::int_<0>
     {};
 
     template<typename Array>
     int get_version(Array& a) { return static_cast<int>(a[0]); }
-    
+
     template<typename Array>
     spec_detail::request_types get_type(Array& a)
     {
       return static_cast<spec_detail::request_types>(a[1]);
     }
-    
+
     template<typename Array>
     boost::uint16_t get_request_id(Array& a)
     {
@@ -449,7 +449,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         }
       }
     };
-    
+
     typedef spec_detail::Header header;
     typedef spec_detail::EndRequestBody end_request_body;
 
@@ -460,12 +460,12 @@ BOOST_CGI_NAMESPACE_BEGIN
       {
         typedef boost::mpl::int_<8> size;
       };
-      
+
       typedef boost::array<
                   unsigned char
                 , header_length::value
               > buffer_type;
-      
+
       buffer_type impl;
 
       begin_request(buffer_type& buf)
@@ -499,7 +499,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         return a[2];
       }
     };
-    
+
     struct stdout_header
       : spec_detail::Header
     {
@@ -536,7 +536,7 @@ BOOST_CGI_NAMESPACE_BEGIN
         , end_request_body(app_status, proc_status)
       {
       }
-      
+
       void reset
       (
           int request_id
